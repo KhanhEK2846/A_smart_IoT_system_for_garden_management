@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sercurity</title>
+  <style>
+      *{
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body{
+        height: 100vh;
+        width: 100vw;
+        background-image: linear-gradient(to right top, #41ff53, #00eeb6, #00d5ff, #00b3ff, #0088ff, #076fff, #474fff, #7500f5, #9500ee, #ad0ce7, #c11de1, #d22ddb);
+        background-size: 300% 100%;
+        background-position: 75% 50%;
+        overflow: hidden;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        transition: 0.5s;
+      }
+      form{
+        width: 90%;
+        margin-bottom: 20px;
+      }
+      button{
+        background-color: transparent;
+        border: 3px solid rgba(255, 255, 255, 0.8);
+        width: 150px;
+        padding: 15px 0 15px 0;
+        border-radius: 100px;
+        font-weight: bolder;
+        transition-duration: 0.3s;
+        transition-property: color,background-color ;
+        cursor: pointer;
+        display: block;
+      }
+      #Accept:hover{
+        color: whitesmoke;
+        background-color: yellowgreen;
+      }
+      #Decline:hover{
+        color: whitesmoke;
+        background-color:red;
+      }
+      .hide{
+        display: none;
+      }
+      .box{
+        top: calc(50% - 250px);
+        min-width: 500px;
+        min-height: 500px;
+        border-radius: 50px;
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: transparent;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        transform-style: preserve-3d;
+      }
+      .box h1{
+        color: white;
+      }
+      .input_box{
+        position: relative;
+        width: 100%;
+        margin: 40px 0;
+        border-bottom: 2px solid #fff;
+      }
+      .input_box:nth-child(2){
+        margin-bottom: 10px;
+      }
+      .input_box label{
+        position: absolute;
+        top: 50%;
+        left: 5px;
+        margin-left: 5px;
+        transform: translateY(-50%);
+        transition: 0.5s;
+        font-weight: bolder;
+        font-size: x-large;
+        color: azure;
+        pointer-events: none;
+      }
+      .input_box input:focus~label, .input_box input:valid~label{
+        top: -15px; 
+        font-size: larger;
+      }
+      .input_box input{
+        border: none;
+        outline: none;
+        font-size: 1em;
+        width: 100%;
+        height: 50px;
+        background: transparent;
+        color: aliceblue;
+        padding: 0 35px 0 5px;
+        font-size: x-large;
+        font-weight: bolder;
+      }
+      .butt_cont{
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        margin-top: 5px;
+      }
+      .bar{
+        display: flex;
+        width: 100%;
+        padding-top: 10px;
+        justify-content: space-around;
+        background-color: transparent;
+        border: none;
+        border-radius: 100px;
+      }
+      .bar button{
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        z-index: 2;
+        background-color: transparent;
+        border: none;
+      }
+      .check_input{
+        display: flex;
+        align-items: center;
+      }
+      #final_label{
+        font-weight: bolder;
+        font-size: large;
+        color: azure;
+        pointer-events: none;
+      }
+      #Check{
+        height: 15px;
+        width: 15px;
+        margin-right: 10px;
+      }
+      #local{
+        transition: 0.5s;
+        position: absolute;
+        width: 150px;
+        height: 46px;
+        border: 5px solid rgba(255, 255, 255, 0.8);
+        border-radius: 100px;
+        z-index: 1;
+        left: calc(6*((100% - 4*150px)/8) + 1.8*150px);
+      }
+
+      @keyframes Flip{
+        0%{
+          transform: rotateY(360deg);
+        }
+        50%{
+          transform: rotateY(0deg);
+        }
+        100%{
+          transform: rotateY(-360deg);
+        }
+      }
+      @keyframes Shock{
+        0%{
+          top: calc(50% - 250px);
+          left: calc(50% - 250px);
+          background-color:rgba(255, 0, 0, 0.1)
+        }
+        25%{
+          top: calc(50% - 250px + 5px);
+          left: calc(50% - 250px);
+          background-color:rgba(255, 0, 0, 0.2)
+        }
+        50%{
+          top: calc(50% - 250px + 5px);
+          left: calc(50% - 250px + 5px);
+          background-color:rgba(255, 0, 0, 0.3)
+        }
+        75%{
+          top: calc(50% - 250px);
+          left: calc(50% - 250px + 5px);
+          background-color:rgba(255, 0, 0, 0.2)
+        }
+        100%{
+          top: calc(50% - 250px);
+          left: calc(50% - 250px);
+          background-color:rgba(255, 0, 0, 0.1);
+        }
+      }
+      @media(max-width: 62em){
+        #local{
+          visibility: hidden;
+        }
+        .box{
+          min-width: 50%;
+          min-height: 50%;
+        }
+        @keyframes Shock{
+          0%{
+            top: calc(50% - 250px);
+            background-color:rgba(255, 0, 0, 0.1)
+          }
+          25%{
+            top: calc(50% - 250px + 5px);
+            background-color:rgba(255, 0, 0, 0.2)
+          }
+          50%{
+            top: calc(50% - 250px + 5px);
+            background-color:rgba(255, 0, 0, 0.3)
+          }
+          75%{
+            top: calc(50% - 250px);
+            background-color:rgba(255, 0, 0, 0.2)
+          }
+          100%{
+            top: calc(50% - 250px);
+            background-color:rgba(255, 0, 0, 0.1);
+          }
+        }
+      }
+  </style>
+</head>
+<body onload="InitDefaultValue()" id="Result">
+  <div class="bar">
+    <button id="Back" onclick="history.back()">Back</button>
+    <button id="Gateway">Gateway</button>
+    <button id="Authentication">User</button>
+    <button id="Authorization">Owner</button>
+    <button id="Configuring">Access</button> 
+    <div id="local"></div>
+  </div> 
+  <div class="box" id="card">
+    <h1 id="Title">Login</h1>
+    <form autocomplete="off">
+      <div class="input_box">
+        <input type="text" id="id" name="user" required><br>
+        <label id="first_label" for="ssid">Username: </label>
+      </div>
+      <div class="input_box">
+        <input type="password" id="password" name="password" required><br>
+        <label id="last_label" for="password">Password: </label>
+      </div>
+      <div class="check_input" id="box">
+        <input id="Check" type="checkbox" onclick="ShowHide()"> 
+        <label id="final_label">Show password</label>
+      </div>
+
+    </form>
+    <div class="butt_cont">
+      <button id="Accept">Accept</button>
+      <button id="Decline">Decline</button>
+    </div>
+  </div>
+  <script>
+    var DefaultValue = [];
+    function InitDefaultValue(){
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200){
+          for( var data of String(this.responseText).split("/"))
+            DefaultValue.push(data);
+          document.getElementById("id").value = DefaultValue[2];
+          document.getElementById("password").value = DefaultValue[3];
+        }
+      };
+      xhr.open("GET", "/BackEndSercure", false);
+      xhr.send();
+    }
+    var state = "Authorization"
+    document.getElementById("Gateway").addEventListener("click",rotate)
+    document.getElementById("Authentication").addEventListener("click",rotate)
+    document.getElementById("Authorization").addEventListener("click",rotate)
+    document.getElementById("Configuring").addEventListener("click",rotate)
+    document.getElementById("Accept").addEventListener("click",Change)
+    document.getElementById("Decline").addEventListener("click",Delete)
+    function rotate(){
+      if(this.id == "Gateway" && state != "Gateway")
+      {
+        document.getElementById("card").style.animation = "Flip 0.5s linear"; 
+        document.body.style.backgroundPosition = "left";  
+        document.getElementById("local").style.left = "calc(2*((100% - 4*150px)/8) + 1.15*150px)";
+        document.body.style.backgroundPosition = "0% 50%";    
+        setTimeout(()=>{
+          document.getElementById("box").style.display = "none";
+          document.getElementById("password").type = "text"
+          document.getElementById("Title").innerHTML = "Gateway";
+          document.getElementById("first_label").innerHTML = "Address (0000 - FFFF):";
+          document.getElementById("last_label").innerHTML = "Channel (00 - 1F):";
+          document.getElementById("id").value = DefaultValue[0];
+          document.getElementById("password").value = DefaultValue[1];
+        },250)
+      }
+      else if(this.id != "Gateway")
+      {
+        document.getElementById("box").style.display = "flex";
+        ShowHide()
+      }
+
+      if(this.id == "Authentication" && state != "Authentication")
+      {
+        document.getElementById("card").style.animation = "Flip 0.5s linear"; 
+        document.getElementById("local").style.left = "calc(4*((100% - 4*150px)/8) + 1.5*150px)";
+        document.body.style.backgroundPosition = "25% 50%";     
+        setTimeout(()=>{
+          document.getElementById("Title").innerHTML = "Authorized";
+          document.getElementById("first_label").innerHTML = "Username:";
+          document.getElementById("last_label").innerHTML = "Password:";
+          document.getElementById("id").value = DefaultValue[4];
+          document.getElementById("password").value = DefaultValue[5];
+        },250)
+      }
+      if(this.id == "Authorization" && state != "Authorization")
+      {
+        document.getElementById("card").style.animation = "Flip 0.5s linear"; 
+        document.getElementById("local").style.left = "calc(6*((100% - 4*150px)/8) + 1.8*150px)";
+        document.body.style.backgroundPosition = "50% 50%";    
+        setTimeout(()=>{
+          document.getElementById("Title").innerHTML = "Login";
+          document.getElementById("first_label").innerHTML = "Username:";
+          document.getElementById("last_label").innerHTML = "Password:";
+          document.getElementById("id").value = DefaultValue[2];
+          document.getElementById("password").value = DefaultValue[3];
+        },250)
+      }
+      if(this.id == "Configuring" && state != "Configuring")
+      {
+        document.getElementById("card").style.animation = "Flip 0.5s linear"; 
+        document.getElementById("local").style.left = "calc(8*((100% - 4*150px)/8) + 2.1*150px)";
+        document.body.style.backgroundPosition = "75% 50%";    
+        setTimeout(()=>{
+          document.getElementById("Title").innerHTML = "AP";
+          document.getElementById("first_label").innerHTML = "SSID:";
+          document.getElementById("last_label").innerHTML = "Password:";
+          document.getElementById("id").value = DefaultValue[6];
+          document.getElementById("password").value = DefaultValue[7];
+        },250)
+      }
+      if(state == this.id)
+        document.getElementById("card").style.animation = "Shock 0.1s 5 linear";
+      state = this.id;
+      setTimeout(()=>{document.getElementById("card").style.animation = "none";},500)
+    }
+    function Delete(){
+      document.getElementById("id").value = ""
+      document.getElementById("password").value = ""
+    }
+    function ShowHide()
+    {
+      if(document.getElementById("Check").checked == true)
+        document.getElementById("password").type = "text"
+      if(document.getElementById("Check").checked == false)
+        document.getElementById("password").type = "password"
+    }
+    function Change(){
+      var noti = "Hello";
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 204)
+            noti = "Success"
+        if (this.readyState == 4 && this.status == 400)
+            noti = "Fail"
+        if (this.readyState == 4 && this.status == 410)
+            noti = "Time up!"
+        if (this.readyState == 4 && this.status == 511)
+            noti = "Connect again"
+        };
+      var DataSend = "{";
+      if(state == "Gateway")
+        DataSend +="Gateway: ";
+      if (state =="Authentication")
+        DataSend +="Authentication: ";
+      if(state == "Authorization")
+        DataSend +="Authorization: ";
+      if (state == "Configuring")
+        DataSend +="AP: ";
+      DataSend += document.getElementById("id").value + "/"+ document.getElementById("password").value + "}";
+      Delete();
+      xhr.open("POST", "/BackEndSercure", false);
+      xhr.send(DataSend);
+      document.querySelector('body').style ="justify-content: center; align-items: center; flex-wrap: nowrap;"
+      document.getElementById('Result').innerHTML = '<div><h1>'+noti+'</h1><div style="display:flex"><button id="Accept" onclick="history.back()">Return Home</button><button id="Decline" onClick="window.location.reload();">Reload Page</button></div></div>'
+    }
+      /*----------------------Detect DevTool------------------------------------*/
+    function OnDevToolIsOpen(){
+        document.querySelector('html').textContent = ''
+    }
+    class DevToolChecker extends Error{
+        toString(){}
+        get message(){OnDevToolIsOpen();}
+    }
+    console.log(new DevToolChecker())
+  </script>
+</body>
+</html>

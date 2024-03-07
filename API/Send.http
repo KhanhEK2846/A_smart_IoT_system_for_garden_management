@@ -1,0 +1,48 @@
+@url = http://192.168.4.1
+@contentType = application/json
+
+
+GET {{url}}
+Authorization: Basic admin:admin
+Content-Type: {{contentType}}
+
+###
+GET {{url}}/Sercurity
+Authorization: Basic admin:admin
+Content-Type: {{contentType}}
+
+###
+GET {{url}}/BackEndSercure
+Authorization: Basic admin:admin
+Content-Type: {{contentType}}
+
+###
+POST {{url}}/BackEndSercure
+Authorization: Basic admin:admin
+Content-Type: {{contentType}}
+
+{
+
+}
+
+###
+GET {{url}}/Tolerance
+Authorization: Basic admin:admin
+Content-Type: {{contentType}}
+
+###
+GET {{url}}/BackEndTolerance
+Authorization: Basic admin:admin
+Content-Type: {{contentType}}
+
+###
+POST {{url}}/BackEndTolerance
+Authorization: Basic admin:admin
+Content-Type: {{contentType}}
+
+{
+
+}
+
+### 
+GET {{url}}/logout

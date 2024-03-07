@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tolerance ranges of plant</title>
+    <style>
+        *{
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        
+      }
+      body{
+        height: 100vh;
+        width: 100vw;
+        background-image: linear-gradient(to bottom, #00fffe, #00ffea, #00ffce, #00ffaa, #00ff80, #00f696, #00eda8, #00e3b4, #00c9df, #00a7ff, #007bff, #320fff);
+        overflow: hidden;
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        transition: 0.5s;
+        align-items: flex-start;
+      }
+      button{
+        margin-bottom: 20px;
+        background-color: azure;
+        border: 0;
+        width: 400px;
+        padding: 15px 0 15px 0;
+        border-radius: 100px;
+        transition-duration: 0.3s;
+        transition-property: color,background-color ;
+        -webkit-box-shadow: 0px 11px 22px -9px #000000; 
+        box-shadow: 0px 11px 22px -9px #000000;
+        cursor: pointer;
+        display: block;
+        font-weight: bolder;
+      }
+      button:hover{
+        color: whitesmoke;
+        background-color: black;
+      }
+      #Accept:hover{
+        color: whitesmoke;
+        background-color: yellowgreen;
+      }
+      #Decline:hover{
+        color: whitesmoke;
+        background-color:red;
+      }
+      .container{
+        margin: auto;
+        width: 100%;
+        height: 90%;
+        padding: 0 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .container h1{
+        margin-bottom: 10px;
+      }
+      form{
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        justify-content: space-evenly;
+      }
+      .box{
+        width: 90%;
+        height: 80%;
+        border: 2px solid whitesmoke;
+        border-radius: 50px;
+      }
+      .container3{
+        width: 1000px;
+        display: flex;
+        justify-content: space-around;
+        margin-top: 50px;
+      }
+      #Back{
+        width: auto;
+        padding: 15px 20px 15px 20px;
+        margin: 20px;
+      }
+      .input_box{
+        display: flex;
+        width: 100%;
+        font-size: larger;
+        font-weight: bolder;
+        margin: 20px 0;
+        padding-left: 6px;
+        align-items: center
+      }
+      .input_box label{
+        width: 10%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .ranges_input{
+        width: 90%;
+        display: flex;
+        justify-content: space-between;
+      }
+      .box .input_box:nth-child(4) .range_input{
+        width: 45%;
+      }
+      .box .input_box:nth-child(4) .range_input input::-webkit-slider-thumb{
+        border: 5px solid #fff700 !important;
+      }
+      .range_input{
+        width: 50%;
+        display: flex;
+        position: relative;
+      }
+      .range_input input{
+        width: 90%;
+        -webkit-appearance: none;
+        appearance: none;
+        cursor: pointer;
+        outline: none;
+        height: 15px;
+        background: #ccc;
+        border-radius: 16px;
+        background-color: transparent;
+        border: 2px solid white;
+      }
+      .range_input input::-webkit-slider-thumb{
+        -webkit-appearance: none;
+        appearance: none;
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        background-color: transparent;
+      }
+      .box .input_box .range_input:nth-child(odd) input::-webkit-slider-thumb{
+        border: 5px solid rgb(38, 0, 255);
+      }
+      .box .input_box .range_input:nth-child(even) input::-webkit-slider-thumb{
+        border: 5px solid rgb(255, 3, 3);
+      }
+      .range_input label{
+        background-color: whitesmoke;
+        border-radius:100% 100% 100% 0%;
+        border: 2px solid rgb(0, 225, 255);
+        width: 30px !important;
+        height: 30px !important;
+        position: absolute;
+        top: -35px;
+        display: flex;
+        justify-content: center !important;
+        align-items: center;
+        font-size: small;
+        font-weight: bolder;
+        visibility: hidden;
+      }
+      .range_input input:hover~label{
+        visibility: visible;
+      }
+      @media (max-width: 1200px) {
+        .box,.container3{
+          width: 100%;
+        }
+      }
+      @media (max-width: 1152px){
+        .input_box{
+          padding: 0;
+          position: relative;
+        }
+        .input_box label{
+          position: absolute;
+          width: 100%;
+          justify-content: flex-start;
+          top:-20px;
+        }
+        .ranges_input{
+          width: 100%;
+        }
+        .range_input{
+          justify-content: center;
+        }
+        .range_input label{
+          top: 100%;
+          border-radius:100% 0% 100% 100%;
+        }
+        button{
+          width: 40%;
+        }
+      }
+    </style>
+</head>
+<body onload="InitDefaultValue()"  id="Result">
+  <button id="Back" onclick="history.back()">Back</button>
+    <div class="container">
+        <h1>Tolerance Ranges</h1>
+        <div class="box">
+          <form autocomplete="off">
+            <div class="input_box">
+              <label for="T">Temperature</label>
+              <div class="ranges_input">
+                <div class="range_input">
+                  <input type="range" name="lowT" id="lowT" max="50" min="0" step="0.1" value="%LOWT%">
+                  <label for="lowT" id="VlowT"></label>
+                </div>
+                <div class="range_input">
+                  <input type="range" name="upT" id="upT" max="50" min="0" step="0.1" value="%UPT%">
+                  <label for="upT" id="VupT"></label>
+                </div>
+              </div>
+            </div>
+            <div class="input_box">
+              <label for="H">Humidity</label>
+              <div class="ranges_input">
+                <div class="range_input">
+                  <input type="range" name="lowH" id="lowH" max="90" min="20" step="0.1" value="%LOWH%">
+                  <label for="lowH" id="VlowH"></label>
+                </div>
+                <div class="range_input">
+                  <input type="range" name="upH" id="upH" max="90" min="20" step="0.1" value="%UPH%">
+                  <label for="upH" id="VupH"></label>
+                </div>
+              </div>
+            </div>
+            <div class="input_box">
+              <label for="SM">Soil Moisture</label>
+              <div class="ranges_input">
+                <div class="range_input">
+                  <input type="range" name="lowSM" id="lowSM" max="100" min="0" step="0.1" value="%LOWSM%">
+                  <label for="lowSM" id="VlowSM"></label>   
+                </div>
+                <div class="range_input">
+                  <input type="range" name="upSM" id="upSM" max="100" min="0" step="0.1" value="%UPSM%">
+                  <label for="upSM" id="VupSM"></label>
+                </div>
+              </div>
+            </div>
+            <div class="input_box">
+              <label for="L">Light</label>
+              <div class="range_input">
+                <input type="range" name="L" id="L" max="100" min="0" step="0.1" value="%L%">
+                <label for="L" id="VL"></label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="container3">
+          <button id="Accept">Accept</button>
+          <button id="Decline">Decline</button>
+        </div>    
+    </div>
+  <script>
+    function InitDefaultValue(){
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function(){
+        if (this.readyState == 4 && this.status == 200){
+          document.getElementById("upT").defaultValue = String(this.responseText).split("/")[0]
+          document.getElementById("lowT").defaultValue = String(this.responseText).split("/")[1]
+          document.getElementById("upH").defaultValue = String(this.responseText).split("/")[2]
+          document.getElementById("lowH").defaultValue = String(this.responseText).split("/")[3]
+          document.getElementById("upSM").defaultValue = String(this.responseText).split("/")[4]
+          document.getElementById("lowSM").defaultValue = String(this.responseText).split("/")[5]
+          document.getElementById("L").defaultValue = String(this.responseText).split("/")[6]
+        }
+      };
+      xhr.open("GET", "/BackEndTolerance", false);
+      xhr.send();
+      document.querySelectorAll(".range_input").forEach(w=>{
+        setBubble(w.querySelector("input"),w.querySelector("label"));
+      })
+    }
+    document.querySelectorAll(".ranges_input").forEach(wraps=>{
+      wraps.querySelectorAll(".range_input")[0].querySelector("input").addEventListener("input",()=>{
+        if(Number(wraps.querySelectorAll(".range_input")[0].querySelector("input").value) > Number(wraps.querySelectorAll(".range_input")[1].querySelector("input").value)){
+          wraps.querySelectorAll(".range_input")[1].querySelector("input").value = wraps.querySelectorAll(".range_input")[0].querySelector("input").value;
+          setBubble(wraps.querySelectorAll(".range_input")[1].querySelector("input"),wraps.querySelectorAll(".range_input")[1].querySelector("label"));
+        }
+        setBubble(wraps.querySelectorAll(".range_input")[0].querySelector("input"),wraps.querySelectorAll(".range_input")[0].querySelector("label"));
+      });
+      wraps.querySelectorAll(".range_input")[1].querySelector("input").addEventListener("input",()=>{
+        if(Number(wraps.querySelectorAll(".range_input")[1].querySelector("input").value) < Number(wraps.querySelectorAll(".range_input")[0].querySelector("input").value)){
+          wraps.querySelectorAll(".range_input")[0].querySelector("input").value = wraps.querySelectorAll(".range_input")[1].querySelector("input").value;
+          setBubble(wraps.querySelectorAll(".range_input")[0].querySelector("input"),wraps.querySelectorAll(".range_input")[0].querySelector("label"));
+        }
+        setBubble(wraps.querySelectorAll(".range_input")[1].querySelector("input"),wraps.querySelectorAll(".range_input")[1].querySelector("label"));
+      });
+        setBubble(wraps.querySelectorAll(".range_input")[0].querySelector("input"),wraps.querySelectorAll(".range_input")[0].querySelector("label"));
+        setBubble(wraps.querySelectorAll(".range_input")[1].querySelector("input"),wraps.querySelectorAll(".range_input")[1].querySelector("label"));
+    });
+    document.querySelectorAll(".range_input")[6].querySelector("input").addEventListener("input",()=>{
+        setBubble(document.querySelectorAll(".range_input")[6].querySelector("input"),document.querySelectorAll(".range_input")[6].querySelector("label"));
+      });
+      setBubble(document.querySelectorAll(".range_input")[6].querySelector("input"),document.querySelectorAll(".range_input")[6].querySelector("label"));
+    
+    function setBubble(range, bubble) {
+      const val = range.value;
+      const min = range.min ? range.min : 0;
+      const max = range.max ? range.max : 100;
+      const newVal = Number(((val - min) * 100) / (max - min));
+      bubble.innerHTML = val;
+      bubble.style.left = `calc(${newVal}% + (${8 - newVal * 0.75}px))`;
+    }
+    document.getElementById("Decline").addEventListener('click',Cancel);
+    document.getElementById("Accept").addEventListener('click',Send);
+    function Cancel(){
+      document.querySelectorAll(".range_input").forEach(Wrap=>{
+        Wrap.querySelector("input").value = Wrap.querySelector("input").defaultValue;
+        setBubble(Wrap.querySelector("input"),Wrap.querySelector("label"));
+      })
+    }
+    function Send(){
+        var noti = "Hello";
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200)
+              noti = "Success"
+          if (this.readyState == 4 && this.status == 410)
+              noti = "Time up!"
+          };
+        var DataSend = "{"+document.getElementById("upT").value +"/"+ document.getElementById("lowT").value +
+                        "/"+document.getElementById("upH").value +"/"+ document.getElementById("lowH").value +
+                        "/"+document.getElementById("upSM").value +"/"+ document.getElementById("lowSM").value +
+                        "/"+document.getElementById("L").value+"}";
+        xhr.open("POST", "/BackEndTolerance", false);
+        xhr.send(DataSend);
+        document.querySelector('body').style ="justify-content: center; align-items: center; flex-wrap: nowrap;"
+        document.getElementById('Result').innerHTML = '<div><h1>'+noti+'</h1><div style="display:flex"><button id="Accept" onclick="history.back()">Return Home</button><button id="Decline" onClick="window.location.reload();">Reload Page</button></div></div>'
+      }
+    /*----------------------Detect DevTool------------------------------------*/
+    function OnDevToolIsOpen(){
+      document.querySelector('html').textContent = ''
+  }
+  class DevToolChecker extends Error{
+      toString(){}
+      get message(){OnDevToolIsOpen();}
+  }
+  console.log(new DevToolChecker())
+  </script>
+</body>
+</html>
