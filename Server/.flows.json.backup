@@ -40,6 +40,14 @@
         "env": []
     },
     {
+        "id": "071ee232d3ea60d6",
+        "type": "tab",
+        "label": "Notification",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "7b18e51371b9da08",
         "type": "group",
         "z": "2c7549e3267c360c",
@@ -66,7 +74,9 @@
             "fd18b2e083b8a9cb"
         ],
         "x": 574,
-        "y": 1239
+        "y": 1239,
+        "w": 1072,
+        "h": 222
     },
     {
         "id": "f73c8450eb6f872d",
@@ -95,7 +105,9 @@
             "9b205ea7cb89e8b5"
         ],
         "x": 2134,
-        "y": 1239
+        "y": 1239,
+        "w": 892,
+        "h": 162
     },
     {
         "id": "0768b1be5520f542",
@@ -121,7 +133,9 @@
             "a3aa364077da9daa"
         ],
         "x": 694,
-        "y": 819
+        "y": 819,
+        "w": 592,
+        "h": 162
     },
     {
         "id": "023e8dd112056349",
@@ -159,7 +173,9 @@
             "f4010ba443c8dfe3"
         ],
         "x": 2134,
-        "y": 1459
+        "y": 1459,
+        "w": 1112,
+        "h": 442
     },
     {
         "id": "91e380ed61976399",
@@ -189,7 +205,9 @@
             "19f86b3acfb3afad"
         ],
         "x": 2134,
-        "y": 1919
+        "y": 1919,
+        "w": 772,
+        "h": 262
     },
     {
         "id": "db7606b5814f193e",
@@ -219,7 +237,9 @@
             "c2093c2969c1d22e"
         ],
         "x": 2144,
-        "y": 2199
+        "y": 2199,
+        "w": 762,
+        "h": 282
     },
     {
         "id": "f532af6f73a050bd",
@@ -3886,6 +3906,52 @@
         "y": 340,
         "wires": [
             []
+        ]
+    },
+    {
+        "id": "d030a89ea742a909",
+        "type": "e-mail",
+        "z": "071ee232d3ea60d6",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "authtype": "BASIC",
+        "saslformat": true,
+        "token": "oauth2Response.access_token",
+        "secure": true,
+        "tls": true,
+        "name": "lehoangkhanh2846912002@gmail.com",
+        "dname": "Notification",
+        "x": 730,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "410d0bbaab8cec49",
+        "type": "inject",
+        "z": "071ee232d3ea60d6",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "Email from Node-Red",
+        "payload": "Hello and Hola",
+        "payloadType": "str",
+        "x": 400,
+        "y": 380,
+        "wires": [
+            [
+                "d030a89ea742a909"
+            ]
         ]
     }
 ]

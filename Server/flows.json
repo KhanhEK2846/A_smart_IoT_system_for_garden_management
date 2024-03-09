@@ -3907,5 +3907,56 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "d030a89ea742a909",
+        "type": "e-mail",
+        "z": "071ee232d3ea60d6",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "authtype": "BASIC",
+        "saslformat": true,
+        "token": "oauth2Response.access_token",
+        "secure": true,
+        "tls": true,
+        "name": "",
+        "dname": "Notification",
+        "x": 730,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "410d0bbaab8cec49",
+        "type": "inject",
+        "z": "071ee232d3ea60d6",
+        "name": "Test",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "to",
+                "v": "lehoangkhanh2846912002@gmail.com",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "Email from Node-Red",
+        "payload": "Hello and Hola from unknow",
+        "payloadType": "str",
+        "x": 370,
+        "y": 380,
+        "wires": [
+            [
+                "d030a89ea742a909"
+            ]
+        ]
     }
 ]
