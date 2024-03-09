@@ -3872,85 +3872,20 @@
         ]
     },
     {
-        "id": "681986b4cb6a83dd",
-        "type": "debug",
-        "z": "9f5704f675d02eb6",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1060,
-        "y": 540,
-        "wires": []
-    },
-    {
         "id": "694e7c672a78ac69",
         "type": "file",
         "z": "9f5704f675d02eb6",
-        "name": "",
+        "name": "StoreData",
         "filename": "D:\\UIT\\Project\\Project2\\Clone\\Smart-big-garden-management-IoT-system\\Server\\data\\dataml.txt",
         "filenameType": "str",
         "appendNewline": true,
         "createDir": false,
         "overwriteFile": "false",
         "encoding": "none",
-        "x": 1830,
-        "y": 380,
+        "x": 1460,
+        "y": 340,
         "wires": [
             []
-        ]
-    },
-    {
-        "id": "1f1b65cb24071c78",
-        "type": "function",
-        "z": "9f5704f675d02eb6",
-        "name": "function 8",
-        "func": "var currentDirectory = __dirname;\nmsg.payload = currentDirectory\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 840,
-        "y": 540,
-        "wires": [
-            [
-                "681986b4cb6a83dd"
-            ]
-        ]
-    },
-    {
-        "id": "fd3a1ea032014625",
-        "type": "inject",
-        "z": "9f5704f675d02eb6",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "",
-        "payloadType": "date",
-        "x": 620,
-        "y": 540,
-        "wires": [
-            [
-                "1f1b65cb24071c78"
-            ]
         ]
     }
 ]
