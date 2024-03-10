@@ -939,5 +939,30 @@
                 "file": "D:\\UIT\\Project\\Graduation\\Code\\Smart-big-garden-management-IoT-system\\Server\\node_modules\\node-red-contrib-whatsapp-cmb\\nodes\\whatsapp.js"
             }
         }
+    },
+    "node-red-contrib-telegrambot": {
+        "name": "node-red-contrib-telegrambot",
+        "version": "15.1.9",
+        "local": true,
+        "user": true,
+        "nodes": {
+            "telegrambot": {
+                "name": "telegrambot",
+                "types": [
+                    "telegram bot",
+                    "telegram receiver",
+                    "telegram command",
+                    "telegram event",
+                    "telegram sender",
+                    "telegram reply",
+                    "telegram control"
+                ],
+                "enabled": true,
+                "local": true,
+                "user": false,
+                "module": "node-red-contrib-telegrambot",
+                "file": "D:\\UIT\\Project\\Graduation\\Code\\Smart-big-garden-management-IoT-system\\Server\\node_modules\\node-red-contrib-telegrambot\\telegrambot\\99-telegrambot.js"
+            }
+        }
     }
 }

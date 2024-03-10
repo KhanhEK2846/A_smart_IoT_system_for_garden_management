@@ -919,5 +919,25 @@
                 "file": "D:\\UIT\\Project\\Graduation\\Code\\Smart-big-garden-management-IoT-system\\Server\\node_modules\\node-red-node-email\\61-email.js"
             }
         }
+    },
+    "node-red-contrib-whatsapp-cmb": {
+        "name": "node-red-contrib-whatsapp-cmb",
+        "version": "1.0.3",
+        "local": true,
+        "user": true,
+        "nodes": {
+            "whatsapp": {
+                "name": "whatsapp",
+                "types": [
+                    "node-red-contrib-whatsapp-cmb-account",
+                    "node-red-contrib-whatsapp-cmb-send-message"
+                ],
+                "enabled": true,
+                "local": true,
+                "user": false,
+                "module": "node-red-contrib-whatsapp-cmb",
+                "file": "D:\\UIT\\Project\\Graduation\\Code\\Smart-big-garden-management-IoT-system\\Server\\node_modules\\node-red-contrib-whatsapp-cmb\\nodes\\whatsapp.js"
+            }
+        }
     }
 }
