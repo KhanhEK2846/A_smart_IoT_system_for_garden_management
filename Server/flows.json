@@ -461,7 +461,7 @@
         "type": "ui_group",
         "name": "ConfigureUser",
         "tab": "45166d28cb8c42fd",
-        "order": 1,
+        "order": 2,
         "disp": false,
         "width": "24",
         "collapse": false,
@@ -472,7 +472,7 @@
         "type": "ui_group",
         "name": "Setting",
         "tab": "45166d28cb8c42fd",
-        "order": 2,
+        "order": 1,
         "disp": true,
         "width": "6",
         "collapse": false,
@@ -599,6 +599,17 @@
         "order": 11,
         "width": 5,
         "height": 1
+    },
+    {
+        "id": "e6c1acfed343481e",
+        "type": "ui_group",
+        "name": "GmailChange",
+        "tab": "45166d28cb8c42fd",
+        "order": 3,
+        "disp": false,
+        "width": "24",
+        "collapse": false,
+        "className": ""
     },
     {
         "id": "2eae1b674da8ac56",
@@ -1686,7 +1697,8 @@
         "y": 1500,
         "wires": [
             [
-                "6a929b59788f0e33"
+                "6a929b59788f0e33",
+                "cfe003dd12352264"
             ]
         ]
     },
@@ -1697,6 +1709,7 @@
         "name": "Number of tree",
         "func": "var TableTree = global.get(\"TableTree\") || [];\nif(!TableTree.includes(msg.topic))\n    TableTree.unshift(msg.topic);\nglobal.set(\"TableTree\", TableTree);\nmsg.options = TableTree ;\nmsg.payload = null;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -1720,11 +1733,12 @@
         "outputType": "auto",
         "path": "Realtime/",
         "useConstraint": false,
-        "x": 360,
+        "x": 100,
         "y": 1880,
         "wires": [
             [
-                "0b93c6cf55f522e2"
+                "0b93c6cf55f522e2",
+                "cfe003dd12352264"
             ]
         ]
     },
@@ -1732,14 +1746,15 @@
         "id": "0b93c6cf55f522e2",
         "type": "function",
         "z": "2c7549e3267c360c",
-        "name": "RTDB",
+        "name": "FilterPlant",
         "func": "var CurrentTree = global.get(\"CurrentTree\") || \"\"\nif(CurrentTree == \"\")\n{\n    CurrentTree = msg.topic;\n    global.set(\"CurrentTree\",CurrentTree);\n}\nif(CurrentTree == msg.topic)\n    return msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 510,
+        "x": 520,
         "y": 1880,
         "wires": [
             [
@@ -2386,9 +2401,10 @@
         "id": "cfb507c5a354afb6",
         "type": "function",
         "z": "2c7549e3267c360c",
-        "name": "function 7",
+        "name": "JSONed",
         "func": "var json = {\n    \"humi\": msg.payload.Sensor.DHT11.Humi,\n    \"temp\": msg.payload.Sensor.DHT11.Temp,\n    \"ligh\": msg.payload.Sensor.Light,\n    \"soil\": msg.payload.Sensor.Solid,\n    \"pump\": msg.payload.Status.Pump,\n    \"led\": msg.payload.Status.Led,\n    \"error_dht\": msg.payload.Error.DHT11,\n    \"error_light\": msg.payload.Error.LDR,\n    \"error_soil\": msg.payload.Error.Soil,\n    \"name\" : msg.payload.Name\n}\nmsg.payload = json;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -2736,6 +2752,19 @@
         "wires": []
     },
     {
+        "id": "cfe003dd12352264",
+        "type": "link out",
+        "z": "2c7549e3267c360c",
+        "name": "Notificate",
+        "mode": "link",
+        "links": [
+            "42b60c84f8fa1fdf"
+        ],
+        "x": 255,
+        "y": 1680,
+        "wires": []
+    },
+    {
         "id": "5fe6711eefb9e865",
         "type": "firebase-in",
         "z": "3992c3350543bb36",
@@ -2781,6 +2810,7 @@
         "name": "StoreData",
         "func": "msg.ui_control = {\n    \"tabulator\": {\n        columnVertAlign : \"bottom\",\n        height: \"311px\",\n        layout: \"fitColumns\",\n        columns: [\n            { title: \"Time\", field: \"time\", width: 160},\n            {\n                title : \"Sensor\",\n                columns: [\n                    { title: \"Humidity\", field: \"humi\"},\n                    { title: \"Temperature\", field: \"temp\" },\n                    { title: \"Light\", field: \"ligh\"},\n                    { title: \"Soil Moisture\", field: \"soil\" }\n                ]\n            },\n            {\n                title: \"Activities\",\n                align: \"center\",\n                columns: [\n                    { title: \"Pump\", field: \"pump\"},\n                    { title: \"LED\", field: \"led\"}\n                ]\n            }\n\n        ]\n    }\n};\n\nvar TableRecord = flow.get(\"TableRecord\") || [];\nif(msg.topic != \"PrevPage\" && msg.topic != \"NextPage\")\n{\n    if (msg.payload.Status.Pump == \"1\")\n        msg.payload.Status.Pump = \"ON\";\n    else\n        msg.payload.Status.Pump = \"OFF\";\n    if (msg.payload.Status.Led == \"1\")\n        msg.payload.Status.Led = \"ON\";\n    else\n        msg.payload.Status.Led = \"OFF\";  \n    if(msg.payload.Error.DHT11 == \"1\")  \n    {\n        msg.payload.Sensor.DHT11.Humi = \"---\"\n        msg.payload.Sensor.DHT11.Temp = \"---\"\n    }\n    if(msg.payload.Error.LDR == \"1\")\n        msg.payload.Sensor.Light = \"---\"\n    if (msg.payload.Error.Soil == \"1\")\n        msg.payload.Sensor.Solid = \"---\"\n    var flag = 0;\n    // @ts-ignore\n    var timestm = new Date(msg.topic * 1000).toLocaleString()\n    for(var i = 0;i < TableRecord.lenght;++i){\n        if ( timestm == TableRecord[i].time)\n        {   \n            flag = 1;\n            break;\n        }\n    }\n    if (flag == 0){\n        TableRecord.unshift({\n            // @ts-ignore\n            \"time\": new Date(msg.topic * 1000).toLocaleString(),\n            \"humi\": msg.payload.Sensor.DHT11.Humi,\n            \"temp\": msg.payload.Sensor.DHT11.Temp,\n            \"ligh\": msg.payload.Sensor.Light,\n            \"soil\": msg.payload.Sensor.Solid,\n            \"pump\": msg.payload.Status.Pump,\n            \"led\": msg.payload.Status.Led\n        });\n        flow.set(\"TableRecord\", TableRecord);\n    }\n}\nvar page = flow.get(\"page\") || 0;\nif (msg.topic == \"PrevPage\" && page != 0)\n    page -= 10;\nif (msg.topic == \"NextPage\" && page <= TableRecord.length -10)\n    page += 10;\nmsg.payload = [(TableRecord[page] == undefined) ? \"\" : TableRecord[page], (TableRecord[page + 1] == undefined) ? \"\" : TableRecord[page + 1], (TableRecord[page + 2] == undefined) ? \"\" : TableRecord[page + 2], (TableRecord[page + 3] == undefined) ? \"\" : TableRecord[page + 3], (TableRecord[page + 4] == undefined) ? \"\" : TableRecord[page + 4], (TableRecord[page + 5] == undefined) ? \"\" : TableRecord[page + 5], (TableRecord[page + 6] == undefined) ? \"\" : TableRecord[page + 6], (TableRecord[page + 7] == undefined) ? \"\" : TableRecord[page + 7], (TableRecord[page + 8] == undefined) ? \"\" : TableRecord[page + 8], (TableRecord[page + 9] == undefined) ? \"\" : TableRecord[page + 9],page];\nflow.set(\"page\",page);\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -3058,9 +3088,10 @@
         "id": "7d78fd684bf83575",
         "type": "function",
         "z": "3992c3350543bb36",
-        "name": "function 4",
+        "name": "FilterPlant",
         "func": "var CurrentTree = global.get(\"CurrentTree\") || \"\"\nif(CurrentTree != \"\" && msg.topic == CurrentTree)\n{\n    return msg;\n}\n",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -3422,8 +3453,8 @@
         "topicType": "msg",
         "splitLayout": "",
         "className": "",
-        "x": 370,
-        "y": 200,
+        "x": 90,
+        "y": 220,
         "wires": [
             [
                 "9131437184a8754c"
@@ -3434,15 +3465,16 @@
         "id": "9131437184a8754c",
         "type": "function",
         "z": "7883bef42eddac18",
-        "name": "function 1",
+        "name": "ChangeAuthor",
         "func": "var user = global.get('user') || \"admin\";\nvar password = global.get('password') || \"\";\n\nif (msg.payload.currentname == user && msg.payload.currentpassword == password)\n{\n    global.set('user', msg.payload.newname)\n    global.set('password', msg.payload.newpassword)\n    msg.payload = \"Change successfully\"\n}\nelse\n{\n    if (msg.payload.currentname != user)\n        msg.payload = \"Invalid user\"\n    else if (msg.payload.currentpassword != password)\n        msg.payload = \"Invalid password\"\n}\n\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 560,
-        "y": 200,
+        "x": 340,
+        "y": 220,
         "wires": [
             [
                 "6df3bd7557d686d7",
@@ -3465,8 +3497,8 @@
         "className": "",
         "topic": "",
         "name": "",
-        "x": 790,
-        "y": 200,
+        "x": 580,
+        "y": 460,
         "wires": []
     },
     {
@@ -3489,7 +3521,7 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 1250,
+        "x": 1530,
         "y": 420,
         "wires": [
             [
@@ -3516,7 +3548,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1470,
+        "x": 1750,
         "y": 420,
         "wires": [
             [
@@ -3530,7 +3562,7 @@
         "z": "7883bef42eddac18",
         "name": "",
         "events": "all",
-        "x": 1680,
+        "x": 1960,
         "y": 700,
         "wires": [
             []
@@ -3544,7 +3576,7 @@
         "links": [
             "e3cb737b90d7a46e"
         ],
-        "x": 1345,
+        "x": 1625,
         "y": 380,
         "wires": [
             [
@@ -3562,7 +3594,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "{\"group\":{\"hide\":[\"Setting_ConfigureUser\"],\"show\":[\"Setting_Setting\"]}}",
+                "to": "{\"group\":{\"hide\":[\"Setting_ConfigureUser\",\"Setting_GmailChange\"],\"show\":[\"Setting_Setting\"]}}",
                 "tot": "json"
             }
         ],
@@ -3571,7 +3603,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1480,
+        "x": 1760,
         "y": 380,
         "wires": [
             [
@@ -3599,7 +3631,7 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 1300,
+        "x": 1580,
         "y": 1120,
         "wires": [
             [
@@ -3627,7 +3659,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1480,
+        "x": 1760,
         "y": 1080,
         "wires": [
             [
@@ -3650,37 +3682,9 @@
         "className": "",
         "topic": "",
         "name": "Notificate",
-        "x": 1480,
+        "x": 1760,
         "y": 1160,
         "wires": []
-    },
-    {
-        "id": "c56ccd9ed01a7af4",
-        "type": "ui_button",
-        "z": "7883bef42eddac18",
-        "name": "Back",
-        "group": "86c7b1f9cabac475",
-        "order": 1,
-        "width": 3,
-        "height": 1,
-        "passthru": true,
-        "label": "Back",
-        "tooltip": "",
-        "color": "",
-        "bgcolor": "",
-        "className": "",
-        "icon": "",
-        "payload": "",
-        "payloadType": "str",
-        "topic": "topic",
-        "topicType": "msg",
-        "x": 1030,
-        "y": 460,
-        "wires": [
-            [
-                "33e0e4139010dc5c"
-            ]
-        ]
     },
     {
         "id": "33e0e4139010dc5c",
@@ -3692,7 +3696,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "{\"group\":{\"hide\":[\"Setting_ConfigureUser\"],\"show\":[\"Setting_Setting\"]}}",
+                "to": "{\"group\":{\"hide\":[\"Setting_ConfigureUser\",\"Setting_GmailChange\"],\"show\":[\"Setting_Setting\"]}}",
                 "tot": "json"
             }
         ],
@@ -3701,7 +3705,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1490,
+        "x": 1770,
         "y": 460,
         "wires": [
             [
@@ -3729,7 +3733,7 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 1300,
+        "x": 1580,
         "y": 500,
         "wires": [
             [
@@ -3747,7 +3751,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "{\"group\":{\"show\":[\"Setting_ConfigureUser\"],\"hide\":[\"Setting_Setting\"]}}",
+                "to": "{\"group\":{\"show\":[\"Setting_ConfigureUser\"],\"hide\":[\"Setting_Setting\",\"Setting_GmailChange\"]}}",
                 "tot": "json"
             }
         ],
@@ -3756,7 +3760,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1480,
+        "x": 1760,
         "y": 500,
         "wires": [
             [
@@ -3781,11 +3785,180 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 790,
-        "y": 340,
+        "x": 830,
+        "y": 460,
         "wires": [
             [
                 "c56ccd9ed01a7af4"
+            ]
+        ]
+    },
+    {
+        "id": "225938e5e85e31f0",
+        "type": "ui_button",
+        "z": "7883bef42eddac18",
+        "name": "",
+        "group": "645689cb032a4e45",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Notification",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1490,
+        "y": 560,
+        "wires": [
+            [
+                "80e518d238df0579"
+            ]
+        ]
+    },
+    {
+        "id": "e0a466cba41379e0",
+        "type": "function",
+        "z": "7883bef42eddac18",
+        "name": "SetGmail",
+        "func": "var mail = global.get(\"mail\") || \"\"\n\nif (mail == \"\" || mail != msg.payload.gmail){\n    global.set(\"mail\", msg.payload.gmail)\n    msg.payload = \"Change successfully\"\n}else{\n    msg.payload = \"No change\"\n}\n\nreturn msg\n    \n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 740,
+        "wires": [
+            [
+                "6df3bd7557d686d7",
+                "8f2ba7bc71066103"
+            ]
+        ]
+    },
+    {
+        "id": "a3fe33bdf652e21e",
+        "type": "ui_form",
+        "z": "7883bef42eddac18",
+        "name": "",
+        "label": "GmailChange",
+        "group": "e6c1acfed343481e",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "options": [
+            {
+                "label": "Gmail",
+                "value": "gmail",
+                "type": "email",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "gmail": ""
+        },
+        "payload": "",
+        "submit": "submit",
+        "cancel": "cancel",
+        "topic": "topic",
+        "topicType": "msg",
+        "splitLayout": "",
+        "className": "",
+        "x": 140,
+        "y": 740,
+        "wires": [
+            [
+                "e0a466cba41379e0"
+            ]
+        ]
+    },
+    {
+        "id": "80e518d238df0579",
+        "type": "change",
+        "z": "7883bef42eddac18",
+        "name": "Change",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"group\":{\"show\":[\"Setting_GmailChange\"],\"hide\":[\"Setting_Setting\"]}}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1760,
+        "y": 560,
+        "wires": [
+            [
+                "690a83449417a90b"
+            ]
+        ]
+    },
+    {
+        "id": "c56ccd9ed01a7af4",
+        "type": "ui_button",
+        "z": "7883bef42eddac18",
+        "name": "Back",
+        "group": "86c7b1f9cabac475",
+        "order": 1,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "label": "Back",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1030,
+        "y": 460,
+        "wires": [
+            [
+                "6bcf177134cdb33d"
+            ]
+        ]
+    },
+    {
+        "id": "6bcf177134cdb33d",
+        "type": "ui_button",
+        "z": "7883bef42eddac18",
+        "name": "Back",
+        "group": "e6c1acfed343481e",
+        "order": 1,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "label": "Back",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1250,
+        "y": 460,
+        "wires": [
+            [
+                "33e0e4139010dc5c"
             ]
         ]
     },
@@ -3921,38 +4094,60 @@
         "tls": true,
         "name": "",
         "dname": "Notification",
-        "x": 730,
-        "y": 380,
+        "x": 950,
+        "y": 660,
         "wires": []
     },
     {
-        "id": "410d0bbaab8cec49",
-        "type": "inject",
+        "id": "42b60c84f8fa1fdf",
+        "type": "link in",
         "z": "071ee232d3ea60d6",
-        "name": "Test",
-        "props": [
-            {
-                "p": "payload"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            },
-            {
-                "p": "to",
-                "v": "lehoangkhanh2846912002@gmail.com",
-                "vt": "str"
-            }
+        "name": "Notificate",
+        "links": [
+            "cfe003dd12352264"
         ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "Email from Node-Red",
-        "payload": "Hello and Hola from unknow",
-        "payloadType": "str",
-        "x": 370,
-        "y": 380,
+        "x": 165,
+        "y": 660,
+        "wires": [
+            [
+                "ca2c570997795358"
+            ]
+        ]
+    },
+    {
+        "id": "ca2c570997795358",
+        "type": "function",
+        "z": "071ee232d3ea60d6",
+        "name": "Check Error",
+        "func": "var ErrorRecord = flow.get(\"ErrorRecord\") || [];\nvar json = {\n    \"error_dht\": msg.payload.Error.DHT11,\n    \"error_light\": msg.payload.Error.LDR,\n    \"error_soil\": msg.payload.Error.Soil,\n}\n\n// Find ID if it has\nvar flag = -1;\nfor(let i =0; i<ErrorRecord.length;i++)\n{\n    if(ErrorRecord[i].id == msg.topic){\n        flag = i;\n        break;\n    }\n}\n\nif(flag == -1) // Save new ID\n{\n    ErrorRecord.unshift({\n    \"id\": msg.topic,\n    \"data\": json\n    });\n    flow.set(\"ErrorRecord\", ErrorRecord);\n    if (json.error_dht == \"1\" || json.error_light == \"1\" || json.error_soil == \"1\"){\n        msg.payload = \"SendAllError\"\n        return msg;\n    }\n}else{ //Check Error\n    var change = false;\n    var tmpData = ErrorRecord[flag];\n    if (json.error_dht == \"1\" && tmpData.data.error_dht == \"0\"){\n        change = true\n    }\n    if (json.error_light == \"1\" && tmpData.data.error_light == \"0\") {\n        change = true\n        \n    }\n    if (json.error_soil == \"1\" && tmpData.data.error_soil == \"0\") {\n        change = true \n    }\n    //Save change data\n    ErrorRecord[flag] = {\n        \"id\": msg.topic,\n        \"data\": json\n    };\n    flow.set(\"ErrorRecord\", ErrorRecord);\n    if(change){\n        msg.payload = \"SendAllError\"\n        return msg;\n    }\n}\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 660,
+        "wires": [
+            [
+                "2af11f27a9fc72c8"
+            ]
+        ]
+    },
+    {
+        "id": "2af11f27a9fc72c8",
+        "type": "function",
+        "z": "071ee232d3ea60d6",
+        "name": "PreSend (To Do) ",
+        "func": "var mail = global.get(\"mail\") || \"\"\nvar ErrorRecord = flow.get(\"ErrorRecord\") || [];\n\nif(mail != \"\"){\n    msg.to = mail\n    var message = \"\"\n    if (msg.payload == \"SendAllError\"){\n        msg.topic = \"Error Sensor List\"\n        var mess = \"\"\n        for (let i = 0; i < ErrorRecord.length; i++) {\n            var tmpData = ErrorRecord[i].data\n            if (tmpData.error_dht == \"1\" || tmpData.error_light == \"1\" || tmpData.error_soil == \"1\") {\n                mess += \"*ID: \" + String(ErrorRecord[i].id) + \"* \\n\"\n                if(tmpData.error_dht == \"1\" )\n                    mess += \"DHT Sensor: Error\\n\"\n                if(tmpData.error_light == \"1\" )\n                    mess += \"Light Sensor: Error\\n\"\n                if(tmpData.error_soil == \"1\" )\n                    mess += \"Soil Moisture Sensor: Error\\n\"\n            }\n        }\n        msg.payload = mess\n    }\n\n    return msg\n    \n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 660,
         "wires": [
             [
                 "d030a89ea742a909"
