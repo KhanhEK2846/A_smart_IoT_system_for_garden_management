@@ -48,6 +48,22 @@
         "env": []
     },
     {
+        "id": "83c672bb152df239",
+        "type": "tab",
+        "label": "API",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "4e5980765b3b01db",
+        "type": "tab",
+        "label": "ControlUI",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
         "id": "7b18e51371b9da08",
         "type": "group",
         "z": "2c7549e3267c360c",
@@ -123,18 +139,18 @@
             "color": "#a4a4a4"
         },
         "nodes": [
-            "699cc72197c37347",
             "daa58ef1a2cbf5f6",
             "2909d19c6a4dc2d1",
             "a132ec7ff53dad98",
             "c2e1b8d4e1d28f98",
             "560fa9e16674210d",
             "e3cb737b90d7a46e",
-            "a3aa364077da9daa"
+            "a3aa364077da9daa",
+            "edb144550d507935"
         ],
         "x": 694,
         "y": 819,
-        "w": 592,
+        "w": 522,
         "h": 162
     },
     {
@@ -479,26 +495,6 @@
         "className": ""
     },
     {
-        "id": "6386f7df2944bfe5",
-        "type": "ui_spacer",
-        "z": "7883bef42eddac18",
-        "name": "spacer",
-        "group": "86c7b1f9cabac475",
-        "order": 2,
-        "width": 21,
-        "height": 1
-    },
-    {
-        "id": "7640b607eeb1e25f",
-        "type": "ui_spacer",
-        "z": "7883bef42eddac18",
-        "name": "spacer",
-        "group": "645689cb032a4e45",
-        "order": 2,
-        "width": 3,
-        "height": 1
-    },
-    {
         "id": "6aab20ed1322aed9",
         "type": "ui_group",
         "name": "Name",
@@ -610,6 +606,36 @@
         "width": "24",
         "collapse": false,
         "className": ""
+    },
+    {
+        "id": "31e8ecede9d492b4",
+        "type": "ui_spacer",
+        "z": "2c7549e3267c360c",
+        "name": "spacer",
+        "group": "645689cb032a4e45",
+        "order": 2,
+        "width": 3,
+        "height": 1
+    },
+    {
+        "id": "39be05feed81ccd9",
+        "type": "ui_spacer",
+        "z": "2c7549e3267c360c",
+        "name": "spacer",
+        "group": "86c7b1f9cabac475",
+        "order": 2,
+        "width": 21,
+        "height": 1
+    },
+    {
+        "id": "18fab13b6b571add",
+        "type": "ui_spacer",
+        "z": "2c7549e3267c360c",
+        "name": "spacer",
+        "group": "e6c1acfed343481e",
+        "order": 2,
+        "width": 21,
+        "height": 1
     },
     {
         "id": "2eae1b674da8ac56",
@@ -918,19 +944,6 @@
         "x": 2630,
         "y": 2380,
         "wires": []
-    },
-    {
-        "id": "699cc72197c37347",
-        "type": "ui_ui_control",
-        "z": "2c7549e3267c360c",
-        "g": "0768b1be5520f542",
-        "name": "",
-        "events": "all",
-        "x": 1200,
-        "y": 900,
-        "wires": [
-            []
-        ]
     },
     {
         "id": "6528fd5d3ee8d0b3",
@@ -1591,8 +1604,8 @@
         "y": 860,
         "wires": [
             [
-                "699cc72197c37347",
-                "a132ec7ff53dad98"
+                "a132ec7ff53dad98",
+                "edb144550d507935"
             ]
         ]
     },
@@ -1663,8 +1676,8 @@
         "y": 900,
         "wires": [
             [
-                "699cc72197c37347",
-                "e3cb737b90d7a46e"
+                "e3cb737b90d7a46e",
+                "edb144550d507935"
             ]
         ]
     },
@@ -2765,6 +2778,20 @@
         "wires": []
     },
     {
+        "id": "edb144550d507935",
+        "type": "link out",
+        "z": "2c7549e3267c360c",
+        "g": "0768b1be5520f542",
+        "name": "ControlUI",
+        "mode": "link",
+        "links": [
+            "baca40bda0b4d1b0"
+        ],
+        "x": 1175,
+        "y": 900,
+        "wires": []
+    },
+    {
         "id": "5fe6711eefb9e865",
         "type": "firebase-in",
         "z": "3992c3350543bb36",
@@ -3068,20 +3095,8 @@
         "y": 1040,
         "wires": [
             [
-                "bea1df53aac089cc"
+                "984faef01cd2e8cc"
             ]
-        ]
-    },
-    {
-        "id": "bea1df53aac089cc",
-        "type": "ui_ui_control",
-        "z": "3992c3350543bb36",
-        "name": "",
-        "events": "all",
-        "x": 1260,
-        "y": 1040,
-        "wires": [
-            []
         ]
     },
     {
@@ -3162,6 +3177,19 @@
         ]
     },
     {
+        "id": "984faef01cd2e8cc",
+        "type": "link out",
+        "z": "3992c3350543bb36",
+        "name": "ControlUI",
+        "mode": "link",
+        "links": [
+            "baca40bda0b4d1b0"
+        ],
+        "x": 1275,
+        "y": 1040,
+        "wires": []
+    },
+    {
         "id": "925788d8689ed1fd",
         "type": "switch",
         "z": "0b1ec363aa46d36b",
@@ -3213,20 +3241,8 @@
         "y": 500,
         "wires": [
             [
-                "2cdcde80648e716c"
+                "b3cf422f08c5a216"
             ]
-        ]
-    },
-    {
-        "id": "2cdcde80648e716c",
-        "type": "ui_ui_control",
-        "z": "0b1ec363aa46d36b",
-        "name": "",
-        "events": "all",
-        "x": 1100,
-        "y": 500,
-        "wires": [
-            []
         ]
     },
     {
@@ -3346,8 +3362,9 @@
         "type": "function",
         "z": "0b1ec363aa46d36b",
         "name": "Welcome_Back",
-        "func": "var name = context.get(\"name\");\n\nif(msg.topic == \"Form\")\n    context.set(\"name\", msg.payload.username);\nif(msg.topic == \"Check\")\n    {\n        if(msg.payload)\n        {\n            msg.payload = \"Welcome back \"+ name;\n            return msg;\n        }\n    }\n",
+        "func": "var name = context.get(\"name\");\n\nif(msg.topic == \"Form\")\n    context.set(\"name\", msg.payload.username);\nif(msg.topic == \"Check\")\n    {\n        if(msg.payload)\n        {\n            msg.payload = \"Welcome back \"+ name;\n            global.set(\"LogIn\",true)\n            return msg;\n        }\n    }\n",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -3398,6 +3415,19 @@
         "color": "#ffffff",
         "x": 370,
         "y": 120,
+        "wires": []
+    },
+    {
+        "id": "b3cf422f08c5a216",
+        "type": "link out",
+        "z": "0b1ec363aa46d36b",
+        "name": "ControlUI",
+        "mode": "link",
+        "links": [
+            "baca40bda0b4d1b0"
+        ],
+        "x": 1045,
+        "y": 500,
         "wires": []
     },
     {
@@ -3552,20 +3582,8 @@
         "y": 420,
         "wires": [
             [
-                "690a83449417a90b"
+                "7efc81c708b31a07"
             ]
-        ]
-    },
-    {
-        "id": "690a83449417a90b",
-        "type": "ui_ui_control",
-        "z": "7883bef42eddac18",
-        "name": "",
-        "events": "all",
-        "x": 1960,
-        "y": 700,
-        "wires": [
-            []
         ]
     },
     {
@@ -3607,7 +3625,7 @@
         "y": 380,
         "wires": [
             [
-                "690a83449417a90b"
+                "7efc81c708b31a07"
             ]
         ]
     },
@@ -3617,7 +3635,7 @@
         "z": "7883bef42eddac18",
         "name": "",
         "group": "645689cb032a4e45",
-        "order": 4,
+        "order": 5,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -3631,12 +3649,12 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 1580,
+        "x": 1360,
         "y": 1120,
         "wires": [
             [
-                "e05bab43800f6790",
-                "bbb2d75af0b71479"
+                "bbb2d75af0b71479",
+                "af49d308952e9952"
             ]
         ]
     },
@@ -3663,7 +3681,7 @@
         "y": 1080,
         "wires": [
             [
-                "690a83449417a90b"
+                "7efc81c708b31a07"
             ]
         ]
     },
@@ -3682,8 +3700,8 @@
         "className": "",
         "topic": "",
         "name": "Notificate",
-        "x": 1760,
-        "y": 1160,
+        "x": 1520,
+        "y": 1180,
         "wires": []
     },
     {
@@ -3709,7 +3727,7 @@
         "y": 460,
         "wires": [
             [
-                "690a83449417a90b"
+                "7efc81c708b31a07"
             ]
         ]
     },
@@ -3719,7 +3737,7 @@
         "z": "7883bef42eddac18",
         "name": "Change",
         "group": "645689cb032a4e45",
-        "order": 3,
+        "order": 4,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -3764,7 +3782,7 @@
         "y": 500,
         "wires": [
             [
-                "690a83449417a90b"
+                "7efc81c708b31a07"
             ]
         ]
     },
@@ -3799,7 +3817,7 @@
         "z": "7883bef42eddac18",
         "name": "",
         "group": "645689cb032a4e45",
-        "order": 2,
+        "order": 3,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -3813,11 +3831,12 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 1490,
+        "x": 1050,
         "y": 560,
         "wires": [
             [
-                "80e518d238df0579"
+                "80e518d238df0579",
+                "6fda75b706412420"
             ]
         ]
     },
@@ -3849,9 +3868,9 @@
         "name": "",
         "label": "GmailChange",
         "group": "e6c1acfed343481e",
-        "order": 2,
-        "width": 0,
-        "height": 0,
+        "order": 4,
+        "width": 24,
+        "height": 1,
         "options": [
             {
                 "label": "Gmail",
@@ -3902,7 +3921,7 @@
         "y": 560,
         "wires": [
             [
-                "690a83449417a90b"
+                "7efc81c708b31a07"
             ]
         ]
     },
@@ -3961,6 +3980,80 @@
                 "33e0e4139010dc5c"
             ]
         ]
+    },
+    {
+        "id": "fa960b1330c37a74",
+        "type": "ui_text",
+        "z": "7883bef42eddac18",
+        "group": "e6c1acfed343481e",
+        "order": 3,
+        "width": 24,
+        "height": 1,
+        "name": "Name",
+        "label": "Current Gmail: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1630,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "6fda75b706412420",
+        "type": "function",
+        "z": "7883bef42eddac18",
+        "name": "GetGmail",
+        "func": "var mail = global.get(\"mail\") || \"\"\nif( mail == \"\"){\n    msg.payload = \"Not Yet\"\n}else{\n    msg.payload = mail\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1360,
+        "y": 740,
+        "wires": [
+            [
+                "fa960b1330c37a74"
+            ]
+        ]
+    },
+    {
+        "id": "af49d308952e9952",
+        "type": "function",
+        "z": "7883bef42eddac18",
+        "name": "LogOut",
+        "func": "global.set(\"LogIn\", false)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1580,
+        "y": 1080,
+        "wires": [
+            [
+                "e05bab43800f6790"
+            ]
+        ]
+    },
+    {
+        "id": "7efc81c708b31a07",
+        "type": "link out",
+        "z": "7883bef42eddac18",
+        "name": "ControlUI",
+        "mode": "link",
+        "links": [
+            "baca40bda0b4d1b0"
+        ],
+        "x": 2005,
+        "y": 720,
+        "wires": []
     },
     {
         "id": "99e13b1dc7ecaa22",
@@ -4099,23 +4192,6 @@
         "wires": []
     },
     {
-        "id": "5f2957c61d4fa076",
-        "type": "debug",
-        "z": "071ee232d3ea60d6",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 920,
-        "y": 820,
-        "wires": []
-    },
-    {
         "id": "42b60c84f8fa1fdf",
         "type": "link in",
         "z": "071ee232d3ea60d6",
@@ -4156,7 +4232,7 @@
         "type": "function",
         "z": "071ee232d3ea60d6",
         "name": "PreSend (To Do) ",
-        "func": "var mail = global.get(\"mail\") || \"\"\nvar ErrorRecord = flow.get(\"ErrorRecord\") || [];\n\nif(mail != \"\"){\n    msg.to = mail\n    var message = \"\"\n    if (msg.payload == \"SendAllError\"){\n        msg.topic = \"Error Sensor List\"\n        var mess = \"\"\n        for (let i = 0; i < ErrorRecord.length; i++) {\n            var tmpData = ErrorRecord[i].data\n            if (tmpData.error_dht == \"1\" || tmpData.error_light == \"1\" || tmpData.error_soil == \"1\") {\n                mess += \"*ID: \" + String(ErrorRecord[i].id) + \"* \\n\"\n                if(tmpData.error_dht == \"1\" )\n                    mess += \"DHT Sensor: Error\\n\"\n                if(tmpData.error_light == \"1\" )\n                    mess += \"Light Sensor: Error\\n\"\n                if(tmpData.error_soil == \"1\" )\n                    mess += \"Soil Moisture Sensor: Error\\n\"\n            }\n        }\n        msg.payload = mess\n    }\n\n    return msg\n    \n}",
+        "func": "var mail = global.get(\"mail\") || \"\"\nvar ErrorRecord = flow.get(\"ErrorRecord\") || [];\n\nif(mail != \"\"){\n    msg.to = mail\n    var message = \"\"\n    if (msg.payload == \"SendAllError\"){\n        msg.topic = \"Error Sensor List\"\n        var mess = \"\"\n        for (let i = 0; i < ErrorRecord.length; i++) {\n            var tmpData = ErrorRecord[i].data\n            if (tmpData.error_dht == \"1\" || tmpData.error_light == \"1\" || tmpData.error_soil == \"1\") {\n                mess += \"ID: \" + String(ErrorRecord[i].id) + \" \\n\"\n                if(tmpData.error_dht == \"1\" )\n                    mess += \"- DHT Sensor: Error\\n\"\n                if(tmpData.error_light == \"1\" )\n                    mess += \"- Light Sensor: Error\\n\"\n                if(tmpData.error_soil == \"1\" )\n                    mess += \"- Soil Moisture Sensor: Error\\n\"\n            }\n        }\n        msg.payload = mess\n    }\n\n    return msg\n    \n}",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -4167,9 +4243,147 @@
         "y": 660,
         "wires": [
             [
-                "5f2957c61d4fa076",
                 "d030a89ea742a909"
             ]
         ]
+    },
+    {
+        "id": "86530270e03db138",
+        "type": "http in",
+        "z": "83c672bb152df239",
+        "name": "Test",
+        "url": "/test",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 290,
+        "y": 420,
+        "wires": [
+            [
+                "347ce60749238d02"
+            ]
+        ]
+    },
+    {
+        "id": "c982cb73c0bc6044",
+        "type": "http response",
+        "z": "83c672bb152df239",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 680,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "347ce60749238d02",
+        "type": "template",
+        "z": "83c672bb152df239",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello world</h1>\n</body>\n</html>",
+        "output": "str",
+        "x": 460,
+        "y": 420,
+        "wires": [
+            [
+                "c982cb73c0bc6044"
+            ]
+        ]
+    },
+    {
+        "id": "143d4278434727f8",
+        "type": "ui_ui_control",
+        "z": "4e5980765b3b01db",
+        "name": "",
+        "events": "all",
+        "x": 600,
+        "y": 380,
+        "wires": [
+            [
+                "c6cb4b3c72987c76"
+            ]
+        ]
+    },
+    {
+        "id": "baca40bda0b4d1b0",
+        "type": "link in",
+        "z": "4e5980765b3b01db",
+        "name": "ControlUI",
+        "links": [
+            "edb144550d507935",
+            "984faef01cd2e8cc",
+            "b3cf422f08c5a216",
+            "7efc81c708b31a07",
+            "0655ae150a96f5b7"
+        ],
+        "x": 405,
+        "y": 380,
+        "wires": [
+            [
+                "143d4278434727f8"
+            ]
+        ]
+    },
+    {
+        "id": "c6cb4b3c72987c76",
+        "type": "function",
+        "z": "4e5980765b3b01db",
+        "name": "AlreadyLogIn",
+        "func": "var LogIn = global.get(\"LogIn\") || false\nif(!LogIn && msg.tab == 0 && msg.name == \"Login\"){\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 380,
+        "wires": [
+            [
+                "1d09a7ffaf20c3e1"
+            ]
+        ]
+    },
+    {
+        "id": "1d09a7ffaf20c3e1",
+        "type": "change",
+        "z": "4e5980765b3b01db",
+        "name": "BackLogIn",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{ \"tab\": \"Login\" }",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1030,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0655ae150a96f5b7",
+        "type": "link out",
+        "z": "4e5980765b3b01db",
+        "name": "ControlUI",
+        "mode": "link",
+        "links": [
+            "baca40bda0b4d1b0"
+        ],
+        "x": 1175,
+        "y": 380,
+        "wires": []
     }
 ]
