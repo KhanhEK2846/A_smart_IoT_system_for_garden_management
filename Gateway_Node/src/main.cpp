@@ -12,6 +12,9 @@
 #include <DataPackage.h>
 #include <Remember.h>
 #include <Plant.h>
+#include <DataSensor.h>
+#include <ActuatorStatus.h>
+#include <Protection.h>
 #include "URL.h"
 #include "html.h"
 #include "CommandCode.h"
@@ -24,17 +27,9 @@
 //DHT11 Variable
 #define DHTTYPE DHT11 
 DHT dht(DHTPIN_Port, DHTTYPE);
-float Humidity = 0; 
-float Temperature = 0;
-//Light Sensor Variable
-int lumen = 0; //Store value from LDR
-//Soild Sensor Variable
-int soilMoist = 0; //Store value from Moisure
-//Sensor Check
-boolean Soil_Err = false;
+//Data Sensor
+DataSensor dataSensor;
 boolean Err = false;//Catch Error Sensor
-boolean DHT_Err = false;
-boolean LDR_Err = false;
 //Plant
 Plant Tree;
 //Days
@@ -45,16 +40,11 @@ const unsigned long A_Day_timestamp = 86400;//24 hours
 unsigned long Times_Pumps=0;
 const unsigned long Next_Pump = 43200000; //12 hours
 unsigned long Still_Pumps = 30000; //Water in 1 minute
-boolean PumpsStatus = false; //Current Status Pump
-//Light
-boolean LightStatus = false; //Current Status Light
+ActuatorStatus statusActuator;
 //Bits -> int
 int ConvertToInt = 0; //DHT_Err LDR_Err Soil_Err LightStatus PumpsStatus
 //WIFI Variable
-String sta_ssid = ""; 
-String sta_password = "" ;
-String ap_ssid = "ESP_";
-String ap_password = "123456789";
+Protection protect;
 const unsigned long Network_TimeOut = 5000;// Wait 5 seconds to Connect Wifi
 //LoRa Variable
 LoRa_E32 lora(&Serial2,4,5,18); //16-->TX 17-->RX 4-->AUX 5-->M1 18-->M0 
@@ -97,7 +87,6 @@ int Command_Light = 0; // 0: Nothing, 1:ON, 2:OFF
 boolean sta_flag = false;
 boolean first_sta = true;
 boolean valueChange_flag = false;
-boolean contingency_flag = false;
 //Type of server
 volatile int gateway_node = 0; // 0:default 1: gateway 2:node
 //Own & Deliver
@@ -120,10 +109,6 @@ const unsigned long long Queue_item_delivery_size = sizeof(DataPackage);
 const unsigned long long Queue_item_command_size = sizeof(String);
 const unsigned long long Queue_item_database_size = sizeof(DataPackage);
 //Sercurity
-String http_username = "admin";
-String http_password = "admin";;
-String auth_username = "owner";
-String auth_password = "owner";
 boolean sercurity_backend_key = false;
 boolean tolerance_backend_key = false;
 const unsigned long reset_key_time = 300000; // 5 minutes to reset
@@ -433,32 +418,32 @@ void notifyClient(AsyncWebSocketClient *client)//Notify only one local client
   int Convert = 0; // DHT_Err LDR_Err Soil_Err LightStatus PumpsStatus
   data += Tree.Name;
   data += "/";
-  Convert |= DHT_Err <<4;
-  Convert |= LDR_Err <<3;
-  Convert |= Soil_Err <<2;
-  Convert |= LightStatus <<1;
-  Convert |= PumpsStatus <<0;
+  Convert |= dataSensor.DHT_Err <<4;
+  Convert |= dataSensor.LDR_Err <<3;
+  Convert |= dataSensor.Soil_Err <<2;
+  Convert |= statusActuator.LightStatus <<1;
+  Convert |= statusActuator.PumpsStatus <<0;
   data += String(Convert);
   data += "/";
-  if(DHT_Err)
+  if(dataSensor.DHT_Err)
     data += String(0);
   else
-    data += String((int)Humidity);
+    data += String((int)dataSensor.Humidity);
   data += "/";
-  if(DHT_Err)
+  if(dataSensor.DHT_Err)
     data += String(0);
   else
-    data += String((int)Temperature);
+    data += String((int)dataSensor.Temperature);
   data += "/";
-  if(LDR_Err)
+  if(dataSensor.LDR_Err)
     data += String(0);
   else
-    data += String(lumen);
+    data += String(dataSensor.lumen);
   data += "/";
-  if(Soil_Err)
+  if(dataSensor.Soil_Err)
     data += String(0);
   else  
-    data += String(soilMoist);
+    data += String(dataSensor.soilMoist);
   data += "/";
   if(WiFi.status() != WL_CONNECTED)   
     data += "Wifi OFF";
@@ -476,10 +461,10 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) //Handle messa
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
     if(String((char*)data).indexOf("Username:") >= 0){
-      sta_ssid = String((char*)data).substring(String((char*)data).indexOf(' ')+1,String((char*)data).length());
+      protect.setID(String((char*)data).substring(String((char*)data).indexOf(' ')+1,String((char*)data).length()),TypeProtect::STA);
     }
     if(String((char*)data).indexOf("Password:") >= 0){
-      sta_password = String((char*)data).substring(String((char*)data).indexOf(' ')+1,String((char*)data).length());
+      protect.setPass(String((char*)data).substring(String((char*)data).indexOf(' ')+1,String((char*)data).length()),TypeProtect::STA);
       sta_flag = true;
     }
     if(String((char*)data).indexOf("NameTree:") >= 0){
@@ -494,13 +479,13 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) //Handle messa
       Reset_ConfigurationLoRa(false);
     }
     if(String((char*)data).indexOf("Pump") >= 0){
-      if(PumpsStatus)
+      if(statusActuator.PumpsStatus)
         Command_Pump = 2;
       else
         Command_Pump = 1;
     }
     if(String((char*)data).indexOf("LED") >= 0){
-      if(LightStatus)
+      if(statusActuator.LightStatus)
         Command_Light = 2;
       else
         Command_Light = 1;
@@ -654,9 +639,9 @@ void Setup_Server()//Initiate connection to the servers
 }
 void Connect_Network()//Connect to Wifi Router
 {
-  if(sta_ssid == "")
+  if(protect.getID(TypeProtect::STA)== "")
     return;
-  WiFi.begin(sta_ssid.c_str(), sta_password.c_str());
+  WiFi.begin(protect.getID(TypeProtect::STA).c_str(), protect.getPass(TypeProtect::STA).c_str());
   long current = millis();
   while (WiFi.status() != WL_CONNECTED && (unsigned long) (millis()- current) < Network_TimeOut)
   {
@@ -696,7 +681,7 @@ void Init_Server()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     if(ON_STA_FILTER(request)) //Only for client from AP Mode
       return request->redirect("/NothingHereForYou");
-    if(!request->authenticate(http_username.c_str(), http_password.c_str()) && !request->authenticate(auth_username.c_str(),auth_password.c_str()))
+    if(!request->authenticate(protect.getID(TypeProtect::HTTP).c_str(), protect.getPass(TypeProtect::HTTP).c_str()) && !request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
       return request->requestAuthentication();
       request->send_P(Received_Code, "text/html", main_html);
   });//Home Page Server
@@ -706,19 +691,19 @@ void Init_Server()
   server.on("/Sercurity",HTTP_GET,[](AsyncWebServerRequest *request){
     if(ON_STA_FILTER(request) ) //Only for client from AP Mode
       return request->redirect("/NothingHereForYou");
-    if(request->authenticate(auth_username.c_str(), auth_password.c_str()))
+    if(request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
     {
       sercurity_backend_key = true;
       before_reset_key = millis();
       return request->send_P(Received_Code,"text/html",Sercurity_html);
     }
-    if(request->authenticate(http_username.c_str(),http_password.c_str()))
+    if(request->authenticate(protect.getID(TypeProtect::HTTP).c_str(), protect.getPass(TypeProtect::HTTP).c_str()))
       return request->send_P(Forbidden_Code,"text/html",Forbidden_html);
     return request->send_P(Not_Found_Code,"text/html",Error_html);
 
   });
   server.on("/BackEndSercure",HTTP_POST,[](AsyncWebServerRequest *request){},NULL,[](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total){
-    if(!sercurity_backend_key || ON_STA_FILTER(request) || !request->authenticate(auth_username.c_str(), auth_password.c_str()))
+    if(!sercurity_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
       return request->send(Gone_Code);
     sercurity_backend_key = false;
     before_reset_key = 0;
@@ -741,29 +726,29 @@ void Init_Server()
       return request->send(Bad_Request_Code);
     if(String((char*) data).indexOf("Authentication: ")>=0)
     {
-      http_username = TmpID;
-      http_password = TmpPass;
+      protect.setID(TmpID,TypeProtect::HTTP);
+      protect.setPass(TmpPass,TypeProtect::HTTP);
       return request->send(No_Content_Code);
     }
     if(String((char*) data).indexOf("Authorization: ")>=0)
     {
-      auth_username = TmpID;
-      auth_password = TmpPass;
+      protect.setID(TmpID,TypeProtect::AUTH);
+      protect.setPass(TmpPass,TypeProtect::AUTH);
       return request->send(No_Content_Code);
     }
     if(String((char*) data).indexOf("AP: ")>=0)
     {
-      ap_ssid = TmpID;
-      ap_password = TmpPass;
+      protect.setID(TmpID,TypeProtect::AP);
+      protect.setPass(TmpPass,TypeProtect::AP);
       request->send(Network_Authentication_Required);
       Person = 0;
-      WiFi.softAP(ap_ssid.c_str(),ap_password.c_str());
+      WiFi.softAP(protect.getID(TypeProtect::AP).c_str(),protect.getPass(TypeProtect::AP).c_str());
     }
     else
       request->send(No_Response_Code);
   });
   server.on("/BackEndSercure",HTTP_GET,[](AsyncWebServerRequest *request){
-    if(!sercurity_backend_key || ON_STA_FILTER(request) || !request->authenticate(auth_username.c_str(), auth_password.c_str()))
+    if(!sercurity_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
       return request->send(Gone_Code);
       char temp0[2] = { 0 };
       char temp1[1] = {0};
@@ -773,35 +758,35 @@ void Init_Server()
       sprintf(temp1,"%02x",Gateway_Channel);
       MessLimit += String(temp1);
       MessLimit += "/";
-      MessLimit += auth_username;
+      MessLimit += protect.getID(TypeProtect::AUTH);
       MessLimit += "/";
-      MessLimit += auth_password;
+      MessLimit += protect.getPass(TypeProtect::AUTH);
       MessLimit += "/";
-      MessLimit += http_username;
+      MessLimit += protect.getID(TypeProtect::HTTP);
       MessLimit += "/";
-      MessLimit += http_password;
+      MessLimit += protect.getPass(TypeProtect::HTTP);
       MessLimit += "/";
-      MessLimit += ap_ssid;
+      MessLimit += protect.getID(TypeProtect::AP);
       MessLimit += "/";
-      MessLimit += ap_password;
+      MessLimit += protect.getPass(TypeProtect::AP);
       MessLimit += "/";
     return request->send_P(Received_Code,"text/plain",MessLimit.c_str());
   });
   server.on("/Tolerance",HTTP_GET,[](AsyncWebServerRequest *request){
     if(ON_STA_FILTER(request)) //Only for client from AP Mode
       return request->redirect("/NothingHereForYou");
-    if(request->authenticate(auth_username.c_str(), auth_password.c_str()))
+    if(request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
     {
       tolerance_backend_key = true;
       before_reset_key = millis();
       return request->send_P(Received_Code,"text/html",Tolerance_html);
     }
-    if(request->authenticate(http_username.c_str(),http_password.c_str()))
+    if(request->authenticate(protect.getID(TypeProtect::HTTP).c_str(),protect.getPass(TypeProtect::HTTP).c_str()))
       return request->send_P(Forbidden_Code,"text/html",Forbidden_html);
     return request->send_P(Not_Found_Code,"text/html",Error_html);
   });
   server.on("/BackEndTolerance",HTTP_POST,[](AsyncWebServerRequest *request){},NULL,[](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total){
-    if(!tolerance_backend_key || ON_STA_FILTER(request) || !request->authenticate(auth_username.c_str(), auth_password.c_str()))
+    if(!tolerance_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
       return request->send(Gone_Code);
     String Filter = String((char*) data).substring(String((char*) data).indexOf('{')+1,String((char*) data).indexOf('}'));
     Tree.Danger_Temp = atof(Filter.substring(0,Filter.indexOf('/')).c_str());
@@ -822,7 +807,7 @@ void Init_Server()
     before_reset_key = 0;
   });
   server.on("/BackEndTolerance",HTTP_GET,[](AsyncWebServerRequest *request){
-    if(!request->authenticate(auth_username.c_str(), auth_password.c_str()) || !tolerance_backend_key)
+    if(!request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()) || !tolerance_backend_key)
       return request->send_P(Forbidden_Code,"text/html",Forbidden_html);
     MessLimit = String(Tree.Danger_Temp);
     MessLimit += "/";
@@ -859,83 +844,83 @@ void PrepareMess() //Decide what to send
   messanger = Tree.Name;
   messanger += "/";
   ConvertToInt = 0;
-  ConvertToInt |= DHT_Err <<4;
-  ConvertToInt |= LDR_Err <<3;
-  ConvertToInt |= Soil_Err <<2;
-  ConvertToInt |= LightStatus <<1;
-  ConvertToInt |= PumpsStatus <<0;
+  ConvertToInt |= dataSensor.DHT_Err <<4;
+  ConvertToInt |= dataSensor.LDR_Err <<3;
+  ConvertToInt |= dataSensor.Soil_Err <<2;
+  ConvertToInt |= statusActuator.LightStatus <<1;
+  ConvertToInt |= statusActuator.PumpsStatus <<0;
   messanger += String(ConvertToInt);
   messanger += "/";
-  if(DHT_Err)
+  if(dataSensor.DHT_Err)
     messanger += String(0);
   else
-    messanger += String((int)Humidity);
+    messanger += String((int)dataSensor.Humidity);
   messanger += "/";
-  if(DHT_Err)
+  if(dataSensor.DHT_Err)
     messanger += String(0);
   else
-    messanger += String((int)Temperature);
+    messanger += String((int)dataSensor.Temperature);
   messanger += "/";
-  if(LDR_Err)
+  if(dataSensor.LDR_Err)
     messanger += String(0);
   else
-    messanger += String(lumen);
+    messanger += String(dataSensor.lumen);
   messanger += "/";
-  if(Soil_Err)
+  if(dataSensor.Soil_Err)
     messanger += String(0);
   else
-    messanger += String(soilMoist);
+    messanger += String(dataSensor.soilMoist);
   messanger += "/";
   messanger += String(Tree.Days);
-  if(Temp[0] != (int)DHT_Err)
+  if(Temp[0] != (int)dataSensor.DHT_Err)
   {
     valueChange_flag = true;
-    Temp[0] = (int)DHT_Err;
+    Temp[0] = (int)dataSensor.DHT_Err;
   }
-  if(Temp[1] != (int)LDR_Err )
+  if(Temp[1] != (int)dataSensor.LDR_Err )
   {
     valueChange_flag = true;
-    Temp[1] = (int)LDR_Err;
+    Temp[1] = (int)dataSensor.LDR_Err;
   }
-  if(Temp[2] != (int)Soil_Err)
+  if(Temp[2] != (int)dataSensor.Soil_Err)
   {
     valueChange_flag = true;
-    Temp[2] = (int)Soil_Err;
+    Temp[2] = (int)dataSensor.Soil_Err;
   }
   if(Temp[3] != (int)Tree.Days )
   {
     valueChange_flag = true;
     Temp[3] = (int)Tree.Days;
   }
-  if(Temp[4] != (int)Humidity)
+  if(Temp[4] != (int)dataSensor.Humidity)
   {
     valueChange_flag = true;
-    Temp[4] = (int)Humidity;
+    Temp[4] = (int)dataSensor.Humidity;
   }
-  if(Temp[5] != (int)Temperature)
+  if(Temp[5] != (int)dataSensor.Temperature)
   {
     valueChange_flag = true;
-    Temp[5] = (int)Temperature;
+    Temp[5] = (int)dataSensor.Temperature;
   }
-  if(Temp[6] != (int)lumen)
+  if(Temp[6] != (int)dataSensor.lumen)
   {
     valueChange_flag = true;
-    Temp[6] = (int)lumen;
+    Temp[6] = (int)dataSensor.lumen;
   }
-  if(Temp[7] != (int)soilMoist)
+  if(Temp[7] != (int)dataSensor.soilMoist)
   {
     valueChange_flag = true;
-    Temp[7] = (int)soilMoist;
+    Temp[7] = (int)dataSensor.soilMoist;
   }
-  if(Temp[8] != (int)LightStatus)
+  if(Temp[8] != (int)statusActuator.LightStatus)
   {
     valueChange_flag = true;
-    Temp[8] = (int)LightStatus;
+    Temp[8] = (int)statusActuator.LightStatus;
   }
-  if(Temp[9] != (int)PumpsStatus)
+  if(Temp[9] != (int)statusActuator.PumpsStatus)
   {
     valueChange_flag = true;
-    Temp[9] = (int)PumpsStatus;
+    Temp[9] = (int)statusActuator.PumpsStatus;
   }
   if(Temp[10] != (int)MQTTStatus )
   {
@@ -1002,39 +987,39 @@ int Get_Sensor(int anaPin)// Get Data From Light Sensor & Soild Sensor
 } 
 void Check()// Check error sensor
 {
-  if(isnan(Humidity) || isnan(Temperature) || Humidity > 90 || Humidity < 20|| Temperature > 50 || Temperature < 0 ){
-      DHT_Err = true;
+  if(isnan(dataSensor.Humidity) || isnan(dataSensor.Temperature) || dataSensor.Humidity > 90 || dataSensor.Humidity < 20|| dataSensor.Temperature > 50 || dataSensor.Temperature < 0 ){
+      dataSensor.DHT_Err = true;
     }
   else{
-      DHT_Err = false;
+      dataSensor.DHT_Err = false;
     }
-  if(lumen < 0 || lumen > 100){
-      LDR_Err = true;
-    }
-  else{
-      LDR_Err = false;
-    }
-  if(soilMoist < 0 || soilMoist > 100){
-      Soil_Err = true;
+  if(dataSensor.lumen < 0 || dataSensor.lumen > 100){
+      dataSensor.LDR_Err = true;
     }
   else{
-      Soil_Err = false;
+      dataSensor.LDR_Err = false;
     }
-  if(DHT_Err || LDR_Err || Soil_Err)
+  if(dataSensor.soilMoist < 0 || dataSensor.soilMoist > 100){
+      dataSensor.Soil_Err = true;
+    }
+  else{
+      dataSensor.Soil_Err = false;
+    }
+  if(dataSensor.DHT_Err || dataSensor.LDR_Err || dataSensor.Soil_Err)
     Err = true;
   else if(Err)
     Err = false;
 }
 void Read_Sensor()//Get Data from All Sensors
 {
-  lumen = Get_Sensor(LDR_Port);
+  dataSensor.lumen = Get_Sensor(LDR_Port);
   delay(500);
-  soilMoist = Get_Sensor(Soil_Moisture_Port);
+  dataSensor.soilMoist = Get_Sensor(Soil_Moisture_Port);
   delay(500);
-  if(!PumpsStatus)
+  if(!statusActuator.PumpsStatus)
   {
-    Humidity = dht.readHumidity();
-    Temperature = dht.readTemperature();
+    dataSensor.Humidity = dht.readHumidity();
+    dataSensor.Temperature = dht.readTemperature();
   }
 
   Check();
@@ -1043,19 +1028,19 @@ void Read_Sensor()//Get Data from All Sensors
 #pragma region Controlled Things
 void Condition_Pump()//Check watering conditions
 {
-  if(((soilMoist < Tree.DRY_SOIL && !Err ||(unsigned long)(millis()-Times_Pumps) >= Next_Pump) || Command_Pump == 1) && !PumpsStatus) //Đang tắt
+  if(((dataSensor.soilMoist < Tree.DRY_SOIL && !Err ||(unsigned long)(millis()-Times_Pumps) >= Next_Pump) || Command_Pump == 1) && !statusActuator.PumpsStatus) //Đang tắt
   {
     Times_Pumps = millis();
-    PumpsStatus = true;
+    statusActuator.PumpsStatus = true;
     if(Command_Pump == 2)
       Command_Pump = 0;
     if(Command_Pump == 1)
       return;
   }
-  if((((Temperature >= Tree.Danger_Temp || Temperature <= Tree.Save_Temp || Humidity >= Tree.Danger_Humi  || soilMoist > Tree.WET_SOIL) && !Err || ((unsigned long)(millis()- Times_Pumps) >= Still_Pumps)) || Command_Pump == 2) && PumpsStatus) //Đang bật
+  if((((dataSensor.Temperature >= Tree.Danger_Temp || dataSensor.Temperature <= Tree.Save_Temp || dataSensor.Humidity >= Tree.Danger_Humi  || dataSensor.soilMoist > Tree.WET_SOIL) && !Err || ((unsigned long)(millis()- Times_Pumps) >= Still_Pumps)) || Command_Pump == 2) && statusActuator.PumpsStatus) //Đang bật
   {
     Times_Pumps = millis(); 
-    PumpsStatus = false;
+    statusActuator.PumpsStatus = false;
     if(Command_Pump == 1)
       Command_Pump = 0;
     if(Command_Pump ==2)
@@ -1065,27 +1050,27 @@ void Condition_Pump()//Check watering conditions
 void Pump()//Pump Choice
 {
   if(Err && Command_Pump == 0)
-    PumpsStatus = false;
+    statusActuator.PumpsStatus = false;
   else
     Condition_Pump();
-  if(PumpsStatus)
+  if(statusActuator.PumpsStatus)
     digitalWrite(Pumps_Port,HIGH);
   else 
     digitalWrite(Pumps_Port,LOW);
 }
 void Condition_Light()//Check lighting up conditions
 {
-  if((lumen <= Tree.DARK_LIGHT && !Err ||  Command_Light == 1 )&& !LightStatus) //Đang tắt
+  if((dataSensor.lumen <= Tree.DARK_LIGHT && !Err ||  Command_Light == 1 )&& !statusActuator.LightStatus) //Đang tắt
     {
-      LightStatus = true;
+      statusActuator.LightStatus = true;
       if(Command_Light == 2)
         Command_Light = 0;
       if(Command_Light ==1)
         return;
     }
-  if((lumen > Tree.DARK_LIGHT && !Err || Command_Light == 2) && LightStatus) // Đang bật
+  if((dataSensor.lumen > Tree.DARK_LIGHT && !Err || Command_Light == 2) && statusActuator.LightStatus) // Đang bật
     {
-      LightStatus = false;
+      statusActuator.LightStatus = false;
       if(Command_Light == 1)
         Command_Light = 0;
       if(Command_Light ==2)
@@ -1095,10 +1080,10 @@ void Condition_Light()//Check lighting up conditions
 void Light_Up()//Light up choice
 {
   if(Err && Command_Light == 0)
-    LightStatus = false;
+    statusActuator.LightStatus = false;
   else
     Condition_Light();
-  if(LightStatus)
+  if(statusActuator.LightStatus)
     digitalWrite(Light_Port,HIGH);
   else 
     digitalWrite(Light_Port,LOW);
@@ -1212,8 +1197,10 @@ void setup()
   Time_Passed = millis();
   WiFi.mode(WIFI_AP_STA);
   Init_Server();
+  String ap_ssid = protect.getID(TypeProtect::AP);
   ap_ssid += ID;
-  WiFi.softAP(ap_ssid.c_str(), ap_password.c_str());
+  protect.setID(ap_ssid,TypeProtect::AP);
+  WiFi.softAP(ap_ssid.c_str(), protect.getPass(TypeProtect::AP).c_str());
   Connect_Network();
 }
 void loop() 
