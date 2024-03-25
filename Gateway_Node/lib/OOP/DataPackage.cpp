@@ -133,6 +133,16 @@ void DataPackage::DataToJson(FirebaseJson* slave)
     //Serial.println(t_data);
 }
 
+boolean DataPackage::CheckFormat(){
+    if(this->Mode == "0"){ //If ACK package
+        if(this->ID.length() == 6 && this->From.length() == 6) return true;
+    }
+    else{
+        if(this->ID.length() == 17 && this->From.length() == 6) return true;
+    }
+    return false;
+}
+
 boolean DataPackage::fromString(const String data)
 {
     if(data.indexOf("{") == -1 || data.lastIndexOf("}") == -1)
@@ -144,7 +154,7 @@ boolean DataPackage::fromString(const String data)
     temp = temp.substring(temp.indexOf(",")+1);
     this->Mode = temp.substring(0,temp.indexOf(","));
     this->data = temp.substring(temp.indexOf(",")+1);
-    return true;
+    return CheckFormat();
 }
 
 void DataPackage::ResetExpired()

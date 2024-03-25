@@ -8,6 +8,7 @@ private:
     String ID;
     String From;
     String data;
+    boolean CheckFormat();
 public:
     int expired;
     String NotDirect;

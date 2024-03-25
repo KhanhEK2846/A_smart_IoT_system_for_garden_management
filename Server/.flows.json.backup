@@ -89,7 +89,7 @@
             "ac34c487c9382149",
             "fd18b2e083b8a9cb"
         ],
-        "x": 574,
+        "x": 654,
         "y": 1239,
         "w": 1072,
         "h": 222
@@ -547,56 +547,6 @@
         "height": 1
     },
     {
-        "id": "a56a83262c3ab588",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 2,
-        "width": 20,
-        "height": 1
-    },
-    {
-        "id": "84d595040dc69123",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 5,
-        "width": 5,
-        "height": 1
-    },
-    {
-        "id": "f6a4f4d286165f15",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 7,
-        "width": 4,
-        "height": 1
-    },
-    {
-        "id": "834910bab4a77db7",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 9,
-        "width": 4,
-        "height": 1
-    },
-    {
-        "id": "35d97f3b2f878ac6",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 11,
-        "width": 5,
-        "height": 1
-    },
-    {
         "id": "e6c1acfed343481e",
         "type": "ui_group",
         "name": "GmailChange",
@@ -608,33 +558,73 @@
         "className": ""
     },
     {
-        "id": "31e8ecede9d492b4",
+        "id": "5e2005d86ec1976f",
         "type": "ui_spacer",
-        "z": "2c7549e3267c360c",
+        "z": "3992c3350543bb36",
         "name": "spacer",
-        "group": "645689cb032a4e45",
+        "group": "6b0fc43246790e58",
         "order": 2,
-        "width": 3,
+        "width": 23,
         "height": 1
     },
     {
-        "id": "39be05feed81ccd9",
+        "id": "2173d3fd714c8fe2",
         "type": "ui_spacer",
-        "z": "2c7549e3267c360c",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 5,
+        "width": 9,
+        "height": 1
+    },
+    {
+        "id": "7b1d7555c83aecc2",
+        "type": "ui_spacer",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 7,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "9aa2c284ac2c4466",
+        "type": "ui_spacer",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 9,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "aa062fcbf6da408b",
+        "type": "ui_spacer",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 11,
+        "width": 9,
+        "height": 1
+    },
+    {
+        "id": "be1214dade1f2fcd",
+        "type": "ui_spacer",
+        "z": "7883bef42eddac18",
         "name": "spacer",
         "group": "86c7b1f9cabac475",
         "order": 2,
-        "width": 21,
+        "width": 22,
         "height": 1
     },
     {
-        "id": "18fab13b6b571add",
+        "id": "28591fe69e0bae58",
         "type": "ui_spacer",
-        "z": "2c7549e3267c360c",
+        "z": "7883bef42eddac18",
         "name": "spacer",
         "group": "e6c1acfed343481e",
         "order": 2,
-        "width": 21,
+        "width": 22,
         "height": 1
     },
     {
@@ -719,7 +709,7 @@
         "width": 6,
         "height": 5,
         "gtype": "gage",
-        "title": "Temperature",
+        "title": "<font>Temperature <i class=\"fa fa-thermometer-empty\" aria-hidden=\"true\"></i></font>",
         "label": "units",
         "format": "{{value}}",
         "min": 0,
@@ -1567,7 +1557,7 @@
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-history",
         "payload": "Change",
         "payloadType": "str",
         "topic": "topic",
@@ -1639,7 +1629,7 @@
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-cogs",
         "payload": "",
         "payloadType": "str",
         "topic": "topic",
@@ -1711,7 +1701,8 @@
         "wires": [
             [
                 "6a929b59788f0e33",
-                "cfe003dd12352264"
+                "cfe003dd12352264",
+                "84e409764b9aab40"
             ]
         ]
     },
@@ -1727,7 +1718,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 280,
+        "x": 400,
         "y": 1500,
         "wires": [
             [
@@ -2106,8 +2097,8 @@
         "topic": "Tree",
         "topicType": "str",
         "className": "",
-        "x": 480,
-        "y": 1500,
+        "x": 400,
+        "y": 1620,
         "wires": [
             [
                 "6d92d01c86784c78",
@@ -2123,11 +2114,12 @@
         "name": "function 2",
         "func": "if (msg.topic == \"Tree\")\n{\n    global.set(\"CurrentTree\",msg.payload)\n    var path = \"Realtime/\"\n    path += msg.payload\n    msg.payload = path\n    \n    return msg;\n}\n    ",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 660,
+        "x": 740,
         "y": 1500,
         "wires": [
             [
@@ -2207,7 +2199,7 @@
         "path": "payload",
         "pathType": "msg",
         "useConstraint": false,
-        "x": 830,
+        "x": 910,
         "y": 1500,
         "wires": [
             [
@@ -2234,7 +2226,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 650,
+        "x": 730,
         "y": 1620,
         "wires": [
             [
@@ -2254,7 +2246,7 @@
             "9f33a0f28b9b0a97",
             "e24a9c333204f2ae"
         ],
-        "x": 765,
+        "x": 845,
         "y": 1620,
         "wires": []
     },
@@ -2334,11 +2326,12 @@
         "name": "function 5",
         "func": "var path = \"DataLog/\";\npath += msg.payload;\nmsg.payload = path;\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 660,
+        "x": 740,
         "y": 1360,
         "wires": [
             [
@@ -2362,7 +2355,7 @@
         "path": "payload",
         "pathType": "msg",
         "useConstraint": true,
-        "x": 830,
+        "x": 910,
         "y": 1360,
         "wires": [
             [
@@ -2382,7 +2375,7 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "topic",
-        "x": 990,
+        "x": 1070,
         "y": 1360,
         "wires": [
             [
@@ -2402,7 +2395,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1140,
+        "x": 1220,
         "y": 1360,
         "wires": [
             [
@@ -2461,7 +2454,7 @@
         "arraySpltType": "len",
         "stream": false,
         "addname": "topic",
-        "x": 1310,
+        "x": 1390,
         "y": 1360,
         "wires": [
             [
@@ -2502,7 +2495,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 4,
-        "x": 1450,
+        "x": 1530,
         "y": 1360,
         "wires": [
             [
@@ -2529,7 +2522,7 @@
         "links": [
             "ced982086979f9e5"
         ],
-        "x": 1605,
+        "x": 1685,
         "y": 1300,
         "wires": []
     },
@@ -2543,7 +2536,7 @@
         "links": [
             "b175a675c6e62914"
         ],
-        "x": 1605,
+        "x": 1685,
         "y": 1340,
         "wires": []
     },
@@ -2557,7 +2550,7 @@
         "links": [
             "aba749fbac219d65"
         ],
-        "x": 1605,
+        "x": 1685,
         "y": 1380,
         "wires": []
     },
@@ -2571,7 +2564,7 @@
         "links": [
             "e04bfbdd7baf05c9"
         ],
-        "x": 1605,
+        "x": 1685,
         "y": 1420,
         "wires": []
     },
@@ -2651,16 +2644,16 @@
         "order": 1,
         "width": 0,
         "height": 0,
-        "name": "",
-        "label": "",
-        "format": "{{msg.payload}}",
+        "name": "TreeName",
+        "label": "<font><i class=\"fa fa-pagelines\" aria-hidden=\"true\"></i></font>",
+        "format": "{{value | uppercase}} ",
         "layout": "row-center",
         "className": "",
         "style": true,
         "font": "Times New Roman,Times,serif",
         "fontSize": "30",
         "color": "#000000",
-        "x": 1530,
+        "x": 1550,
         "y": 2100,
         "wires": []
     },
@@ -2671,7 +2664,7 @@
         "g": "7b18e51371b9da08",
         "name": "Init current tree chart value",
         "info": "",
-        "x": 730,
+        "x": 810,
         "y": 1280,
         "wires": []
     },
@@ -2792,6 +2785,28 @@
         "wires": []
     },
     {
+        "id": "84e409764b9aab40",
+        "type": "function",
+        "z": "2c7549e3267c360c",
+        "name": "Init Tree (Only First Time)",
+        "func": "var CurrentTree = global.get(\"CurrentTree\") || \"\"\nif(CurrentTree == \"\")\n{\n    CurrentTree = msg.topic;\n    global.set(\"CurrentTree\",CurrentTree);\n    msg.payload = msg.topic\n    msg.topic = \"Tree\"\n    \n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 1360,
+        "wires": [
+            [
+                "a3021a82fd27f8e2",
+                "6d92d01c86784c78",
+                "54035e2979b19c82"
+            ]
+        ]
+    },
+    {
         "id": "5fe6711eefb9e865",
         "type": "firebase-in",
         "z": "3992c3350543bb36",
@@ -2820,7 +2835,7 @@
         "name": "Table Record",
         "order": 4,
         "width": 25,
-        "height": 7,
+        "height": 6,
         "columns": [],
         "outputs": 1,
         "cts": true,
@@ -2883,15 +2898,15 @@
         "name": "Next",
         "group": "6b0fc43246790e58",
         "order": 10,
-        "width": 3,
+        "width": 1,
         "height": 1,
         "passthru": false,
-        "label": "Next",
+        "label": "",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-angle-right",
         "payload": "page",
         "payloadType": "flow",
         "topic": "NextPage",
@@ -2911,15 +2926,15 @@
         "name": "Prev",
         "group": "6b0fc43246790e58",
         "order": 6,
-        "width": 3,
+        "width": 1,
         "height": 1,
         "passthru": false,
-        "label": "Prev",
+        "label": "",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-angle-left",
         "payload": "page",
         "payloadType": "flow",
         "topic": "PrevPage",
@@ -3016,15 +3031,15 @@
         "name": "Refresh Table",
         "group": "6b0fc43246790e58",
         "order": 3,
-        "width": 2,
+        "width": 1,
         "height": 1,
         "passthru": false,
-        "label": "Refresh",
+        "label": "",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-refresh",
         "payload": "",
         "payloadType": "str",
         "topic": "topic",
@@ -3044,15 +3059,15 @@
         "name": "Return Home Page",
         "group": "6b0fc43246790e58",
         "order": 1,
-        "width": 3,
+        "width": 1,
         "height": 1,
         "passthru": false,
-        "label": "Return Home Page",
+        "label": "",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-home",
         "payload": "",
         "payloadType": "str",
         "topic": "topic",
@@ -3132,30 +3147,9 @@
         "y": 220,
         "wires": [
             [
-                "48b06614727ed1a6"
+                "5de6cd24faed8d8a"
             ]
         ]
-    },
-    {
-        "id": "48b06614727ed1a6",
-        "type": "ui_text",
-        "z": "3992c3350543bb36",
-        "group": "b89b7c34fae54a61",
-        "order": 1,
-        "width": 0,
-        "height": 0,
-        "name": "",
-        "label": "",
-        "format": "{{msg.payload}}",
-        "layout": "row-center",
-        "className": "",
-        "style": true,
-        "font": "Times New Roman,Times,serif",
-        "fontSize": "30",
-        "color": "#000000",
-        "x": 790,
-        "y": 220,
-        "wires": []
     },
     {
         "id": "8284d3ab790b6727",
@@ -3187,6 +3181,27 @@
         ],
         "x": 1275,
         "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "5de6cd24faed8d8a",
+        "type": "ui_text",
+        "z": "3992c3350543bb36",
+        "group": "b89b7c34fae54a61",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "TreeName",
+        "label": "<font><i class=\"fa fa-pagelines\" aria-hidden=\"true\"></i></font>",
+        "format": "{{value | uppercase}} ",
+        "layout": "row-center",
+        "className": "",
+        "style": true,
+        "font": "Times New Roman,Times,serif",
+        "fontSize": "30",
+        "color": "#000000",
+        "x": 790,
+        "y": 220,
         "wires": []
     },
     {
@@ -3538,15 +3553,15 @@
         "name": "Return Home Page",
         "group": "645689cb032a4e45",
         "order": 1,
-        "width": 3,
-        "height": 1,
+        "width": 0,
+        "height": 0,
         "passthru": false,
-        "label": "Return Home Page",
+        "label": "Home",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-home",
         "payload": "",
         "payloadType": "str",
         "topic": "topic",
@@ -3635,7 +3650,7 @@
         "z": "7883bef42eddac18",
         "name": "",
         "group": "645689cb032a4e45",
-        "order": 5,
+        "order": 4,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -3735,9 +3750,9 @@
         "id": "05b2be7fce90053f",
         "type": "ui_button",
         "z": "7883bef42eddac18",
-        "name": "Change",
+        "name": "Change User & Password",
         "group": "645689cb032a4e45",
-        "order": 4,
+        "order": 3,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -3746,12 +3761,12 @@
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-user",
         "payload": "",
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 1580,
+        "x": 1470,
         "y": 500,
         "wires": [
             [
@@ -3817,7 +3832,7 @@
         "z": "7883bef42eddac18",
         "name": "",
         "group": "645689cb032a4e45",
-        "order": 3,
+        "order": 2,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -3826,11 +3841,11 @@
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-bell",
         "payload": "",
         "payloadType": "str",
-        "topic": "topic",
-        "topicType": "msg",
+        "topic": "Change",
+        "topicType": "str",
         "x": 1050,
         "y": 560,
         "wires": [
@@ -3868,7 +3883,7 @@
         "name": "",
         "label": "GmailChange",
         "group": "e6c1acfed343481e",
-        "order": 4,
+        "order": 5,
         "width": 24,
         "height": 1,
         "options": [
@@ -3932,15 +3947,15 @@
         "name": "Back",
         "group": "86c7b1f9cabac475",
         "order": 1,
-        "width": 3,
+        "width": 2,
         "height": 1,
         "passthru": true,
-        "label": "Back",
+        "label": "",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-cog",
         "payload": "",
         "payloadType": "str",
         "topic": "topic",
@@ -3960,15 +3975,15 @@
         "name": "Back",
         "group": "e6c1acfed343481e",
         "order": 1,
-        "width": 3,
+        "width": 2,
         "height": 1,
         "passthru": true,
-        "label": "Back",
+        "label": "",
         "tooltip": "",
         "color": "",
         "bgcolor": "",
         "className": "",
-        "icon": "",
+        "icon": "fa-cog",
         "payload": "",
         "payloadType": "str",
         "topic": "topic",
@@ -3987,7 +4002,7 @@
         "z": "7883bef42eddac18",
         "group": "e6c1acfed343481e",
         "order": 3,
-        "width": 24,
+        "width": 22,
         "height": 1,
         "name": "Name",
         "label": "Current Gmail: ",
@@ -4007,7 +4022,7 @@
         "type": "function",
         "z": "7883bef42eddac18",
         "name": "GetGmail",
-        "func": "var mail = global.get(\"mail\") || \"\"\nif( mail == \"\"){\n    msg.payload = \"Not Yet\"\n}else{\n    msg.payload = mail\n}\nreturn msg;",
+        "func": "var mail = global.get(\"mail\") || \"\"\nif (msg.topic == \"Change\"){\n    if( mail == \"\"){\n        msg.payload = \"Not Yet\"\n    }else{\n        msg.payload = mail\n    }\n}\nif (msg.topic == \"Reset\"){\n    msg.payload = \"Not Yet\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -4054,6 +4069,84 @@
         "x": 2005,
         "y": 720,
         "wires": []
+    },
+    {
+        "id": "93762de513da450c",
+        "type": "ui_button",
+        "z": "7883bef42eddac18",
+        "name": "",
+        "group": "e6c1acfed343481e",
+        "order": 4,
+        "width": 2,
+        "height": 1,
+        "passthru": false,
+        "label": "",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "fa-trash",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "Reset",
+        "topicType": "str",
+        "x": 50,
+        "y": 460,
+        "wires": [
+            [
+                "2cd67180572b7ffd"
+            ]
+        ]
+    },
+    {
+        "id": "2cd67180572b7ffd",
+        "type": "function",
+        "z": "7883bef42eddac18",
+        "name": "ResetGmail",
+        "func": "var mail = global.get(\"mail\") || \"\"\nif (msg.topic == \"Reset\") {\n    if (mail == \"\") {\n        msg.payload = \"Nothing to Reset\"\n    } else {\n        global.set(\"mail\", \"\")\n        msg.payload = \"Reset Gmail successfully\"\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 460,
+        "wires": [
+            [
+                "6df3bd7557d686d7",
+                "024ab3dc8bfda136"
+            ]
+        ]
+    },
+    {
+        "id": "024ab3dc8bfda136",
+        "type": "link out",
+        "z": "7883bef42eddac18",
+        "name": "TextGmail",
+        "mode": "link",
+        "links": [
+            "2d65db03d877412e"
+        ],
+        "x": 355,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "2d65db03d877412e",
+        "type": "link in",
+        "z": "7883bef42eddac18",
+        "name": "TextGmail",
+        "links": [
+            "024ab3dc8bfda136"
+        ],
+        "x": 1125,
+        "y": 740,
+        "wires": [
+            [
+                "6fda75b706412420"
+            ]
+        ]
     },
     {
         "id": "99e13b1dc7ecaa22",
@@ -4333,7 +4426,7 @@
         "type": "function",
         "z": "4e5980765b3b01db",
         "name": "AlreadyLogIn",
-        "func": "var LogIn = global.get(\"LogIn\") || false\nif(!LogIn && msg.tab == 0 && msg.name == \"Login\"){\n    return msg;\n}\n",
+        "func": "var LogIn = global.get(\"LogIn\") || false\nif(!LogIn && msg.tab != 0 && msg.name != \"Login\"){\n    return msg;\n}\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -4370,7 +4463,9 @@
         "x": 1030,
         "y": 380,
         "wires": [
-            []
+            [
+                "0655ae150a96f5b7"
+            ]
         ]
     },
     {
