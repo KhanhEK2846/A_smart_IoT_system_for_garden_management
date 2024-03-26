@@ -28,6 +28,6 @@ public:
     void setID(const String data, int id);
     String getPass(int id) const;
     void setPass(const String data, int id);
-
+    void AppendIDAP(const String append_id);
 };
 

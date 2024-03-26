@@ -20,7 +20,7 @@ Remember::Remember()
 
 Remember::~Remember(){}
 
-bool Remember::Add(const String ID, const String From)
+bool Remember::AddAddress(const String ID, const String From)
 {
     if(ID == "" || From == "")
         return false;
@@ -42,7 +42,31 @@ bool Remember::Add(const String ID, const String From)
     return true;
 }
 
-String Remember::GetAddrress(const String ID)
+void Remember::RemoveAddress(const String ID){
+    if(ID == "")
+        return;
+    bool del = false;
+    for(flag =0;flag<10;flag++){
+        if(data[flag].ID == ID){
+            del = true;
+            count--;
+        }
+        if(del){
+            if(data[flag].ID == "" && data[flag].NodeAdrress == "")
+                return;
+            if(flag == 9)//End of Memory
+            {
+                data[flag].ID = "";
+                data[flag].NodeAdrress = "";
+            }else{
+                data[flag].ID = data[flag+1].ID;
+                data[flag].NodeAdrress = data[flag+1].NodeAdrress;    
+            }
+        }
+    }
+}
+
+String Remember::GetAddress(const String ID)
 {
     if(ID == "")
         return "";

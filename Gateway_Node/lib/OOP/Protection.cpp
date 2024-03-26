@@ -97,3 +97,7 @@ void Protection::setPass(const String data, int id){
             break;
     }
 }
+
+void Protection::AppendIDAP(const String append_id){
+    ap_ssid += append_id;
+}

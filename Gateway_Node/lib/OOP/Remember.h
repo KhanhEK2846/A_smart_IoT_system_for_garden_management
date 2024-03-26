@@ -22,6 +22,7 @@ private:
 public:
     Remember();
     ~Remember();
-    bool Add(const String ID = "", const String From = "");
-    String GetAddrress(const String ID = "");
+    bool AddAddress(const String ID = "", const String From = "");
+    void RemoveAddress(const String ID = "");
+    String GetAddress(const String ID = "");
 };

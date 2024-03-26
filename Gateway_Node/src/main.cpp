@@ -207,22 +207,25 @@ void Delivery(void * pvParameters)
     /*----------------------Memorize---------------------------*/
     if(data.GetMode() == Memorize)
     {
-      Locate.Add(data.GetID(),data.GetFrom());
+      Locate.AddAddress(data.GetID(),data.GetFrom());
       continue;
     }
     /*-----------------Check Expired---------------------------*/  
     if(data.expired == 0)
     {
+      if(data.GetMode() == CommandNotDirect)
+      {
+        Locate.RemoveAddress(data.GetID());
+        continue;
+      }
       if(data.GetMode() == CommandDirect)
       {
-        data.NotDirect = Locate.GetAddrress(data.GetID());
+        data.NotDirect = Locate.GetAddress(data.GetID());
         if(data.NotDirect == "")
           continue; //TODO: Solution for ID not found
         data.ResetExpired();
         data.SetMode(CommandNotDirect); //Direct -> Not Direct
       }
-      if(data.GetMode() == CommandNotDirect)
-        continue;
       if(data.GetMode() == LogData)
       {
         Gateway_AddH = 0;
@@ -1197,10 +1200,8 @@ void setup()
   Time_Passed = millis();
   WiFi.mode(WIFI_AP_STA);
   Init_Server();
-  String ap_ssid = protect.getID(TypeProtect::AP);
-  ap_ssid += ID;
-  protect.setID(ap_ssid,TypeProtect::AP);
-  WiFi.softAP(ap_ssid.c_str(), protect.getPass(TypeProtect::AP).c_str());
+  protect.AppendIDAP(ID);
+  WiFi.softAP(protect.getID(TypeProtect::AP).c_str(), protect.getPass(TypeProtect::AP).c_str());
   Connect_Network();
 }
 void loop() 
