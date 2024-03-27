@@ -58,6 +58,10 @@ String Own_address = "";
 volatile uint8_t Gateway_AddH = 0;
 volatile uint8_t Gateway_AddL = 0;
 volatile uint8_t Gateway_Channel = 0x17;
+volatile int Friend_Channel = 0;
+const unsigned long Delay_Hello_Message = 300000; //% minutes/say
+unsigned long Wait_to_Hello = 0;
+DataPackage Hello_Message;
 //Ping
 WiFiClient PingClient;
 const unsigned long time_delay_to_ping = 300000; // 5 minutes/ping
@@ -208,10 +212,30 @@ void Delivery(void * pvParameters)
   while(true)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
+    Serial.print(data.toString(true));
     /*----------------------Memorize---------------------------*/
     if(data.GetMode() == Memorize)
     {
       Locate.AddAddress(data.GetID(),data.GetFrom());
+      continue;
+    }
+    /*-----------------Say Hello---------------------------*/ //TODO: Test them
+    if(data.GetMode() == SayHello)
+    {
+      if(data.GetID() == ID)
+      {
+        lora.sendBroadcastFixedMessage(Friend_Channel,data.toString());
+        Friend_Channel = (Friend_Channel < 31)? Friend_Channel+1 : 0;
+      }else{
+        DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
+        Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
+        data.SetDataPackage(ID,"",String(Own_Channel),SayHi);
+        lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
+      }
+      continue;
+    }
+    if(data.GetMode()== SayHi){
+      Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
       continue;
     }
     /*-----------------Check Expired---------------------------*/  
@@ -230,7 +254,7 @@ void Delivery(void * pvParameters)
         data.ResetExpired();
         data.SetMode(CommandNotDirect); //Direct -> Not Direct
       }
-      if(data.GetMode() == LogData)
+      if(data.GetMode() == LogData) //TODO: Using Friend Around 
       {
         Gateway_AddH = 0;
         Gateway_AddL = 0;
@@ -296,6 +320,11 @@ void Capture(void * pvParameters)
       Serial.print(ID);
       Serial.println(" receive:");
       Serial.println(Receive_Pack.toString(true));
+      /*------------------------Say Hi------------------------*/
+      if(Receive_Pack.GetMode() == SayHello || Receive_Pack.GetMode() == SayHi){
+        xQueueSendToFront(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));
+        continue;
+      }
       /*------------------------Response------------------------*/
       if(Receive_Pack.GetMode() == ACK) //Receive ACK
       {
@@ -385,8 +414,6 @@ void Init_LoRa()
   Configuration configuration = *(Configuration*) c.data;
   CalculateAddressChannel(ID,Own_AddH,Own_AddL,Own_Channel);
   Own_address = EnCodeAddressChannel(Own_AddH,Own_AddL,Own_Channel);
-  O_Pack.SetFrom(Own_address);
-  MQTT_Data.SetFrom("000017"); //MQTT work only when it's gateway
   if(c.status.code == 1)
   {
     configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
@@ -402,8 +429,10 @@ void Init_LoRa()
     configuration.OPTION.fec = 0b1;
     configuration.OPTION.transmissionPower = 0;
     lora_flag = true;
-    if(gateway_node == GATEWAYNODE::DEFAULt_STATUS)
+    if(gateway_node == GATEWAYNODE::DEFAULt_STATUS){
       gateway_node = GATEWAYNODE::NODE_STATUS;
+    }
+      
   }
   else
   {
@@ -846,6 +875,12 @@ void Init_Server()
 }
 #pragma endregion
 #pragma region Send Message
+void InitPackage()
+{
+    O_Pack.SetDataPackage(ID,Own_address,"","");
+    MQTT_Data.SetFrom("000017"); //MQTT work only when it's gateway
+    Hello_Message.SetDataPackage(ID,"",String(Own_Channel),SayHello);
+}
 void PrepareMess() //Decide what to send
 {
   messanger.clear();
@@ -983,6 +1018,27 @@ void SendMess() //Send mess prepared to who
       }  
     }
   }
+}
+void Hello_Around()
+{
+  if(Wait_to_Hello == 0){
+    Wait_to_Hello = millis();
+    return;
+  }
+  if((unsigned long)(millis()-Wait_to_Hello)> Delay_Hello_Message)
+  {
+    if(Friend_Channel >= 0 && Friend_Channel <= 31){
+      if(gateway_node == GATEWAYNODE::GATEWAY_STATUS)
+        Hello_Message.SetDataPackage("","000017","","");
+      else
+        Hello_Message.SetDataPackage("",Own_address,"","");
+      xQueueSend(Queue_Delivery,&Hello_Message,pdMS_TO_TICKS(10));
+    }
+    Wait_to_Hello = millis();
+  }
+
+
+  
 }
 #pragma endregion Send Message
 #pragma region Sensor Data Read
@@ -1160,6 +1216,7 @@ void Network()// Netword Part
   ws.cleanupClients();
   PrepareMess();
   SendMess();
+  Hello_Around();
   if(sta_flag)
   {
     WiFi.mode(WIFI_AP_STA);
@@ -1209,6 +1266,7 @@ void setup()
   Init_Server();
   protect.AppendIDAP(ID);
   WiFi.softAP(protect.getID(TypeProtect::AP).c_str(), protect.getPass(TypeProtect::AP).c_str());
+  InitPackage();
   Connect_Network();
 }
 void loop() 
