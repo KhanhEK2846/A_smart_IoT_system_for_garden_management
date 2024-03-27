@@ -12,9 +12,16 @@ dataRemeber::~dataRemeber()
     ID.remove(0);
 }
 
+FriendAround::FriendAround(){
+    friendID = "";
+}
+
+FriendAround::~FriendAround(){
+    friendID.remove(0);
+}
+
 Remember::Remember()
 {
-    count = 0;
     flag = 0;
 }
 
@@ -34,11 +41,10 @@ bool Remember::AddAddress(const String ID, const String From)
         if(data[flag].ID == "")
             break;
     }
-    if(count == 10)
+    if(flag == 10)
         return false;
     data[flag].ID = ID;
     data[flag].NodeAdrress = From;
-    count ++;
     return true;
 }
 
@@ -49,7 +55,6 @@ void Remember::RemoveAddress(const String ID){
     for(flag =0;flag<10;flag++){
         if(data[flag].ID == ID){
             del = true;
-            count--;
         }
         if(del){
             if(data[flag].ID == "" && data[flag].NodeAdrress == "")
@@ -66,7 +71,7 @@ void Remember::RemoveAddress(const String ID){
     }
 }
 
-String Remember::GetAddress(const String ID)
+const String Remember::GetAddress(const String ID)
 {
     if(ID == "")
         return "";
@@ -81,4 +86,26 @@ String Remember::GetAddress(const String ID)
         }
     }
     return "";
+}
+
+bool Remember::AddFriend(const String ID,const int channel){
+    if(ID == "" || channel == -1 || channel > 31)
+        return false;
+    if(friends[channel].friendID != ""){
+        friends[channel].friendID = ID;
+        return true;
+    }
+    return false;
+}
+
+void Remember::RemoveFriend(const int channel){
+    if(channel == -1 || channel > 31)
+        return;
+    friends[channel].friendID = "";
+}
+
+String Remember::GetFriend(const int channel) const{
+    if(channel == -1 || channel > 31)
+        return "";
+    return friends[channel].friendID;
 }

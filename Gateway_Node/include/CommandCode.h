@@ -18,3 +18,5 @@
 #define CommandNotDirect "4" //Not Direct Command
 #define LogData "5" //Log to Database
 #define Memorize "6" // Remember ID & From
+#define SayHello "7" // Send Hello to a channel
+#define Response "8" // Response Hello received

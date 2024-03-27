@@ -124,10 +124,8 @@ const String ID = WiFi.macAddress();
 //Slove Command
 String Actuator = "";
 String Require = "";
-//Loop variable
-int i;
 // Store Recent Value
-int Temp[11] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+int TempData[11] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 #pragma region Common Function
 unsigned long getTime() // Get Timestamp
 { 
@@ -219,7 +217,7 @@ void Delivery(void * pvParameters)
     /*-----------------Check Expired---------------------------*/  
     if(data.expired == 0)
     {
-      if(data.GetMode() == CommandNotDirect)
+      if(data.GetMode() == CommandNotDirect) // Remove ID From Memory
       {
         Locate.RemoveAddress(data.GetID());
         continue;
@@ -882,60 +880,60 @@ void PrepareMess() //Decide what to send
     messanger += String(dataSensor.soilMoist);
   messanger += "/";
   messanger += String(Tree.Days);
-  if(Temp[0] != (int)dataSensor.DHT_Err)
+  if(TempData[0] != (int)dataSensor.DHT_Err)
   {
     valueChange_flag = true;
-    Temp[0] = (int)dataSensor.DHT_Err;
+    TempData[0] = (int)dataSensor.DHT_Err;
   }
-  if(Temp[1] != (int)dataSensor.LDR_Err )
+  if(TempData[1] != (int)dataSensor.LDR_Err )
   {
     valueChange_flag = true;
-    Temp[1] = (int)dataSensor.LDR_Err;
+    TempData[1] = (int)dataSensor.LDR_Err;
   }
-  if(Temp[2] != (int)dataSensor.Soil_Err)
+  if(TempData[2] != (int)dataSensor.Soil_Err)
   {
     valueChange_flag = true;
-    Temp[2] = (int)dataSensor.Soil_Err;
+    TempData[2] = (int)dataSensor.Soil_Err;
   }
-  if(Temp[3] != (int)Tree.Days )
+  if(TempData[3] != (int)Tree.Days )
   {
     valueChange_flag = true;
-    Temp[3] = (int)Tree.Days;
+    TempData[3] = (int)Tree.Days;
   }
-  if(Temp[4] != (int)dataSensor.Humidity)
+  if(TempData[4] != (int)dataSensor.Humidity)
   {
     valueChange_flag = true;
-    Temp[4] = (int)dataSensor.Humidity;
+    TempData[4] = (int)dataSensor.Humidity;
   }
-  if(Temp[5] != (int)dataSensor.Temperature)
+  if(TempData[5] != (int)dataSensor.Temperature)
   {
     valueChange_flag = true;
-    Temp[5] = (int)dataSensor.Temperature;
+    TempData[5] = (int)dataSensor.Temperature;
   }
-  if(Temp[6] != (int)dataSensor.lumen)
+  if(TempData[6] != (int)dataSensor.lumen)
   {
     valueChange_flag = true;
-    Temp[6] = (int)dataSensor.lumen;
+    TempData[6] = (int)dataSensor.lumen;
   }
-  if(Temp[7] != (int)dataSensor.soilMoist)
+  if(TempData[7] != (int)dataSensor.soilMoist)
   {
     valueChange_flag = true;
-    Temp[7] = (int)dataSensor.soilMoist;
+    TempData[7] = (int)dataSensor.soilMoist;
   }
-  if(Temp[8] != (int)statusActuator.LightStatus)
+  if(TempData[8] != (int)statusActuator.LightStatus)
   {
     valueChange_flag = true;
-    Temp[8] = (int)statusActuator.LightStatus;
+    TempData[8] = (int)statusActuator.LightStatus;
   }
-  if(Temp[9] != (int)statusActuator.PumpsStatus)
+  if(TempData[9] != (int)statusActuator.PumpsStatus)
   {
     valueChange_flag = true;
-    Temp[9] = (int)statusActuator.PumpsStatus;
+    TempData[9] = (int)statusActuator.PumpsStatus;
   }
-  if(Temp[10] != (int)MQTTStatus )
+  if(TempData[10] != (int)MQTTStatus )
   {
     valueChange_flag = true;
-    Temp[10] = (int)MQTTStatus;
+    TempData[10] = (int)MQTTStatus;
   }
   
 }
