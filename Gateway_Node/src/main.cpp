@@ -19,14 +19,16 @@
 #include "html.h"
 #include "CommandCode.h"
 //GPIO_PORT
-#define DHTPIN_Port 21 //Read DHT22 Sensor
-#define LDR_Port 34 //Read Light Sensor
-#define Soil_Moisture_Port 35 //Read Soild Sensor
-#define Pumps_Port 22 // Control Pump
-#define Light_Port 23 //Control Light
+enum PORT{
+  DHTPIN_Port = 21,
+  LDR_Port = 34,
+  Soil_Moisture_Port = 35,
+  Pumps_Port = 22,
+  Light_Port = 23
+};
 //DHT11 Variable
 #define DHTTYPE DHT11 
-DHT dht(DHTPIN_Port, DHTTYPE);
+DHT dht(PORT::DHTPIN_Port, DHTTYPE);
 //Data Sensor
 DataSensor dataSensor;
 boolean Err = false;//Catch Error Sensor
@@ -81,18 +83,22 @@ int Person = 0; // Number clients access local host
 String messanger;
 String MessLimit;
 //Command from client
-int Command_Pump = 0; // 0: Nothing, 1:ON, 2:OFF
-int Command_Light = 0; // 0: Nothing, 1:ON, 2:OFF
+int Command_Pump = AllStatus::NOTHING; 
+int Command_Light = AllStatus::NOTHING;
 //flag
 boolean sta_flag = false;
 boolean first_sta = true;
 boolean valueChange_flag = false;
 //Type of server
-volatile int gateway_node = 0; // 0:default 1: gateway 2:node
+enum GATEWAYNODE{
+  DEFAULt_STATUS,
+  GATEWAY_STATUS,
+  NODE_STATUS
+};
+volatile int gateway_node = GATEWAYNODE::DEFAULt_STATUS; // 0:default 1: gateway 2:node
 //Own & Deliver
 DataPackage O_Pack;
 String O_Command;
-String D_Command;
 DataPackage MQTT_Data;
 const unsigned long own_delay_send = 5000; // 5 seconds/send
 unsigned long own_wait_time = 0;
@@ -144,7 +150,7 @@ void Make_Day()//Counter Day
 #pragma region Check Internet Connected from Wifi
 void PingNetwork()// Ping to host
 {
-  if(gateway_node == 1){ //If it's gateway, check Internet
+  if(gateway_node == GATEWAYNODE::GATEWAY_STATUS){ //If it's gateway, check Internet
     if (PingClient.connect(PINGInternet, 80)) {
       ping_flag = true;
     } else {
@@ -277,6 +283,7 @@ void Capture(void * pvParameters)
   String TempAddress = "";
   DataPackage Receive_Pack;
   DataPackage Memory_Pack;
+  String D_Command;
   Memory_Pack.SetMode(Memorize);
   ResponseACK.SetMode(ACK);
   const String Own_Adrress = *((String*)pvParameters);
@@ -323,9 +330,9 @@ void Capture(void * pvParameters)
       }
       if(Receive_Pack.GetMode() == CommandDirect || Receive_Pack.GetMode() == CommandNotDirect || Receive_Pack.GetMode() == LogData) //Send ACK
       {
-        if(gateway_node == 1)
+        if(gateway_node == GATEWAYNODE::GATEWAY_STATUS)
           ResponseACK.SetDataPackage(Receive_Pack.GetFrom(),"000017",Receive_Pack.GetMode(),"");
-        if(gateway_node == 2)
+        if(gateway_node == GATEWAYNODE::NODE_STATUS)
           ResponseACK.SetDataPackage(Receive_Pack.GetFrom(),Own_Adrress,Receive_Pack.GetMode(),"");
         Serial.println("Prepare to Send ACK");
         xQueueSendToFront(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
@@ -351,14 +358,14 @@ void Capture(void * pvParameters)
         }
         if(Receive_Pack.GetMode() == Default || Receive_Pack.GetMode() == LogData)//Send to gateway or database
         {
-          if(gateway_node == 0)
+          if(gateway_node == GATEWAYNODE::DEFAULt_STATUS)
             continue;
-          if(gateway_node == 1)// If it's a gateway -> Send to Database
+          if(gateway_node == GATEWAYNODE::GATEWAY_STATUS)// If it's a gateway -> Send to Database
           {
             xQueueSend(Queue_Database,&Receive_Pack,pdMS_TO_TICKS(10));
             continue;
           }
-          if(gateway_node ==2)//If it's a node -> Delivery to Gateway
+          if(gateway_node == GATEWAYNODE::NODE_STATUS)//If it's a node -> Delivery to Gateway
           {
             xQueueSend(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));
             continue;
@@ -397,8 +404,8 @@ void Init_LoRa()
     configuration.OPTION.fec = 0b1;
     configuration.OPTION.transmissionPower = 0;
     lora_flag = true;
-    if(gateway_node == 0)
-      gateway_node = 2;
+    if(gateway_node == GATEWAYNODE::DEFAULt_STATUS)
+      gateway_node = GATEWAYNODE::NODE_STATUS;
   }
   else
   {
@@ -476,22 +483,22 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) //Handle messa
     if(String((char*)data).indexOf("Disconnect") >= 0){
       WiFi.disconnect(true,true);
       WiFi.mode(WIFI_AP);
-      gateway_node = 2;
+      gateway_node = GATEWAYNODE::NODE_STATUS;
       ping_flag = false;
       notifyClients("Wifi OFF");
       Reset_ConfigurationLoRa(false);
     }
     if(String((char*)data).indexOf("Pump") >= 0){
       if(statusActuator.PumpsStatus)
-        Command_Pump = 2;
+        Command_Pump = AllStatus::OFF;
       else
-        Command_Pump = 1;
+        Command_Pump = AllStatus::ON;
     }
     if(String((char*)data).indexOf("LED") >= 0){
       if(statusActuator.LightStatus)
-        Command_Light = 2;
+        Command_Light = AllStatus::OFF;
       else
-        Command_Light = 1;
+        Command_Light = AllStatus::ON;
     }
   }
 }//Handle messange from local clients
@@ -545,18 +552,18 @@ void callback(char* topic, byte *payload, unsigned int length)// Receive Messang
       if(t_ID == ID)
       {
         if(t_command == "N")
-            Command_Pump = 1;
+            Command_Pump = AllStatus::ON;
         else if(t_command == "F")
-            Command_Pump = 2;
+            Command_Pump = AllStatus::OFF;
       }else flag = true;
     }
     if(String(topic) == MQTT_LED_TOPIC){ 
       if(t_ID == ID)
       {
         if(t_command == "N")
-            Command_Light = 1;
+            Command_Light = AllStatus::ON;
         else if(t_command == "F")
-            Command_Light = 2;
+            Command_Light = AllStatus::OFF;
       }else flag = true;
     }
     if(flag)
@@ -659,7 +666,7 @@ void Connect_Network()//Connect to Wifi Router
   }
   else
   {
-    gateway_node = 1;
+    gateway_node = GATEWAYNODE::GATEWAY_STATUS;
     Reset_ConfigurationLoRa();
     if(Person > 0)
       notifyClients("Wifi ON");
@@ -939,19 +946,19 @@ void SendMess() //Send mess prepared to who
   
   if(((unsigned long)(millis()- Last_datalogging_time)>time_delay_send_datalogging)||Last_datalogging_time == 0)
   {
-    if(((!ping_flag || first_sta) && (gateway_node != 2)))
+    if(((!ping_flag || first_sta) && (gateway_node != GATEWAYNODE::NODE_STATUS)))
       return;
-    if(Firebase.ready() || gateway_node == 2)
+    if(Firebase.ready() || gateway_node == GATEWAYNODE::NODE_STATUS)
     {
       Last_datalogging_time = millis();
       own_wait_time = millis(); //Renew realtime send
       O_Pack.SetDataPackage(ID,"",messanger,LogData);
       switch (gateway_node)
       {
-      case 1: // Gateway -> Database
+      case GATEWAYNODE::GATEWAY_STATUS: // Gateway -> Database
         xQueueSend(Queue_Database,&O_Pack,pdMS_TO_TICKS(10));
         break;
-      case 2: //Node -> Gateway
+      case GATEWAYNODE::NODE_STATUS: //Node -> Gateway
         xQueueSend(Queue_Delivery,&O_Pack,pdMS_TO_TICKS(10));
         break;
       default:
@@ -964,7 +971,7 @@ void SendMess() //Send mess prepared to who
     if(valueChange_flag)
     {
       O_Pack.SetDataPackage(ID,"",messanger,Default);
-      if(!sent_RTDB && gateway_node == 2 && ((unsigned long)(millis() - own_wait_time)>own_delay_send )) //Send to Gateway only if It's a node
+      if(!sent_RTDB && gateway_node == GATEWAYNODE::NODE_STATUS && ((unsigned long)(millis() - own_wait_time)>own_delay_send )) //Send to Gateway only if It's a node
       {
         own_wait_time = millis();
         xQueueSend(Queue_Delivery,&O_Pack,pdMS_TO_TICKS(10));
@@ -1015,9 +1022,9 @@ void Check()// Check error sensor
 }
 void Read_Sensor()//Get Data from All Sensors
 {
-  dataSensor.lumen = Get_Sensor(LDR_Port);
+  dataSensor.lumen = Get_Sensor(PORT::LDR_Port);
   delay(500);
-  dataSensor.soilMoist = Get_Sensor(Soil_Moisture_Port);
+  dataSensor.soilMoist = Get_Sensor(PORT::Soil_Moisture_Port);
   delay(500);
   if(!statusActuator.PumpsStatus)
   {
@@ -1031,65 +1038,67 @@ void Read_Sensor()//Get Data from All Sensors
 #pragma region Controlled Things
 void Condition_Pump()//Check watering conditions
 {
-  if(((dataSensor.soilMoist < Tree.DRY_SOIL && !Err ||(unsigned long)(millis()-Times_Pumps) >= Next_Pump) || Command_Pump == 1) && !statusActuator.PumpsStatus) //Đang tắt
+  //Condition & Error || Time until Pump || Current Command
+  if((((dataSensor.soilMoist < Tree.DRY_SOIL || dataSensor.Humidity < Tree.Save_Humi ) && !Err ||(unsigned long)(millis()-Times_Pumps) >= Next_Pump) || Command_Pump == AllStatus::ON) && !statusActuator.PumpsStatus) //Đang tắt
   {
     Times_Pumps = millis();
     statusActuator.PumpsStatus = true;
-    if(Command_Pump == 2)
-      Command_Pump = 0;
-    if(Command_Pump == 1)
+    if(Command_Pump == AllStatus::OFF)
+      Command_Pump = AllStatus::NOTHING;
+    if(Command_Pump == AllStatus::ON)
       return;
   }
-  if((((dataSensor.Temperature >= Tree.Danger_Temp || dataSensor.Temperature <= Tree.Save_Temp || dataSensor.Humidity >= Tree.Danger_Humi  || dataSensor.soilMoist > Tree.WET_SOIL) && !Err || ((unsigned long)(millis()- Times_Pumps) >= Still_Pumps)) || Command_Pump == 2) && statusActuator.PumpsStatus) //Đang bật
+  //Condition & Error || Time until Stop || Current Command
+  if((((dataSensor.Temperature >= Tree.Danger_Temp || dataSensor.Temperature <= Tree.Save_Temp || dataSensor.Humidity >= Tree.Danger_Humi  || dataSensor.soilMoist > Tree.WET_SOIL) && !Err || ((unsigned long)(millis()- Times_Pumps) >= Still_Pumps)) || Command_Pump == AllStatus::OFF) && statusActuator.PumpsStatus) //Đang bật
   {
     Times_Pumps = millis(); 
     statusActuator.PumpsStatus = false;
-    if(Command_Pump == 1)
-      Command_Pump = 0;
-    if(Command_Pump ==2)
+    if(Command_Pump == AllStatus::ON)
+      Command_Pump = AllStatus::NOTHING;
+    if(Command_Pump ==AllStatus::OFF)
       return;
   }
 }
 void Pump()//Pump Choice
 {
-  if(Err && Command_Pump == 0)
+  if(Err && Command_Pump == AllStatus::NOTHING)
     statusActuator.PumpsStatus = false;
   else
     Condition_Pump();
   if(statusActuator.PumpsStatus)
-    digitalWrite(Pumps_Port,HIGH);
+    digitalWrite(PORT::Pumps_Port,HIGH);
   else 
-    digitalWrite(Pumps_Port,LOW);
+    digitalWrite(PORT::Pumps_Port,LOW);
 }
 void Condition_Light()//Check lighting up conditions
 {
-  if((dataSensor.lumen <= Tree.DARK_LIGHT && !Err ||  Command_Light == 1 )&& !statusActuator.LightStatus) //Đang tắt
+  if((dataSensor.lumen <= Tree.DARK_LIGHT && !Err ||  Command_Light == AllStatus::ON )&& !statusActuator.LightStatus) //Đang tắt
     {
       statusActuator.LightStatus = true;
-      if(Command_Light == 2)
-        Command_Light = 0;
-      if(Command_Light ==1)
+      if(Command_Light == AllStatus::OFF)
+        Command_Light = AllStatus::NOTHING;
+      if(Command_Light == AllStatus::ON)
         return;
     }
-  if((dataSensor.lumen > Tree.DARK_LIGHT && !Err || Command_Light == 2) && statusActuator.LightStatus) // Đang bật
+  if((dataSensor.lumen > Tree.DARK_LIGHT && !Err || Command_Light == AllStatus::OFF) && statusActuator.LightStatus) // Đang bật
     {
       statusActuator.LightStatus = false;
-      if(Command_Light == 1)
-        Command_Light = 0;
-      if(Command_Light ==2)
+      if(Command_Light == AllStatus::ON)
+        Command_Light = AllStatus::NOTHING;
+      if(Command_Light ==AllStatus::OFF)
         return;
     }
 }
 void Light_Up()//Light up choice
 {
-  if(Err && Command_Light == 0)
+  if(Err && Command_Light == AllStatus::NOTHING)
     statusActuator.LightStatus = false;
   else
     Condition_Light();
   if(statusActuator.LightStatus)
-    digitalWrite(Light_Port,HIGH);
+    digitalWrite(PORT::Light_Port,HIGH);
   else 
-    digitalWrite(Light_Port,LOW);
+    digitalWrite(PORT::Light_Port,LOW);
 }
 #pragma endregion
 #pragma region Main System
@@ -1102,17 +1111,17 @@ void Solve_Command()
     if(Actuator == "L")
     {
       if(Require == "N")
-          Command_Light = 1;
+          Command_Light = AllStatus::ON;
       else if(Require == "F")
-          Command_Light = 2;
+          Command_Light = AllStatus::OFF;
       return;
     }
     if(Actuator == "P")
     {
       if(Require == "N")
-          Command_Pump = 1;
+          Command_Pump = AllStatus::ON;
       else if(Require == "F")
-          Command_Pump = 2;
+          Command_Pump = AllStatus::OFF;
       return;
     }
   }
@@ -1192,10 +1201,10 @@ void setup()
   Init_LoRa();
   Init_Task();
   initWebSocket();
-  pinMode(Pumps_Port,OUTPUT);
-  pinMode(Light_Port,OUTPUT);
-  digitalWrite(Pumps_Port,LOW);
-  digitalWrite(Light_Port,LOW);
+  pinMode(PORT::Pumps_Port,OUTPUT);
+  pinMode(PORT::Light_Port,OUTPUT);
+  digitalWrite(PORT::Pumps_Port,LOW);
+  digitalWrite(PORT::Light_Port,LOW);
   dht.begin();
   Time_Passed = millis();
   WiFi.mode(WIFI_AP_STA);

@@ -1,5 +1,11 @@
 #include <stdlib.h>
 
+enum AllStatus{
+    NOTHING,
+    ON,
+    OFF
+};
+
 class ActuatorStatus
 {
 public:
