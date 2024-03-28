@@ -18,17 +18,21 @@
 #include "URL.h"
 #include "html.h"
 #include "CommandCode.h"
+#include "CycleTime.h"
 //GPIO_PORT
 enum PORT{
   DHTPIN_Port = 21,
   LDR_Port = 34,
   Soil_Moisture_Port = 35,
   Pumps_Port = 22,
-  Light_Port = 23
+  Light_Port = 23,
+  AUX_Port = 4,
+  M1_Port = 5,
+  M0_Port = 18
 };
 //DHT11 Variable
 #define DHTTYPE DHT11 
-DHT dht(PORT::DHTPIN_Port, DHTTYPE);
+DHT dht(DHTPIN_Port, DHTTYPE);
 //Data Sensor
 DataSensor dataSensor;
 boolean Err = false;//Catch Error Sensor
@@ -36,20 +40,16 @@ boolean Err = false;//Catch Error Sensor
 Plant Tree;
 //Days
 unsigned long Time_Passed = 0;
-const unsigned long A_Day_milis = 86400000;//24 hours
-const unsigned long A_Day_timestamp = 86400;//24 hours
 //Pump
 unsigned long Times_Pumps=0;
-const unsigned long Next_Pump = 43200000; //12 hours
 unsigned long Still_Pumps = 30000; //Water in 1 minute
 ActuatorStatus statusActuator;
 //Bits -> int
 int ConvertToInt = 0; //DHT_Err LDR_Err Soil_Err LightStatus PumpsStatus
 //WIFI Variable
 Protection protect;
-const unsigned long Network_TimeOut = 5000;// Wait 5 seconds to Connect Wifi
 //LoRa Variable
-LoRa_E32 lora(&Serial2,4,5,18); //16-->TX 17-->RX 4-->AUX 5-->M1 18-->M0 
+LoRa_E32 lora(&Serial2,AUX_Port,M1_Port,M0_Port); //16-->TX 17-->RX 4-->AUX 5-->M1 18-->M0 
 volatile boolean lora_flag = false;
 uint8_t Own_AddH;
 uint8_t Own_AddL;
@@ -59,21 +59,16 @@ volatile uint8_t Gateway_AddH = 0;
 volatile uint8_t Gateway_AddL = 0;
 volatile uint8_t Gateway_Channel = 0x17;
 volatile int Friend_Channel = 0;
-const unsigned long Delay_Hello_Message = 300000; //% minutes/say
 unsigned long Wait_to_Hello = 0;
 DataPackage Hello_Message;
 //Ping
 WiFiClient PingClient;
-const unsigned long time_delay_to_ping = 300000; // 5 minutes/ping
 unsigned long Last_ping_time = 0;
 boolean ping_flag = false; //Result Ping
 //NTP
 unsigned long timestamp;
-const long  gmtOffset_sec = 7 * 60 * 60; // UTC +7
-const int daylightOffset_sec = 0; //Daylight saving time
 //Firebase Variable
 FirebaseData firebaseData;
-const unsigned long time_delay_send_datalogging = 180000; //3 minutes/Send
 unsigned long Last_datalogging_time = 0;
 //MQTT Variable
 WiFiClient wifiClient;
@@ -87,8 +82,8 @@ int Person = 0; // Number clients access local host
 String messanger;
 String MessLimit;
 //Command from client
-int Command_Pump = AllStatus::NOTHING; 
-int Command_Light = AllStatus::NOTHING;
+int Command_Pump = NOTHING; 
+int Command_Light = NOTHING;
 //flag
 boolean sta_flag = false;
 boolean first_sta = true;
@@ -99,12 +94,11 @@ enum GATEWAYNODE{
   GATEWAY_STATUS,
   NODE_STATUS
 };
-volatile int gateway_node = GATEWAYNODE::DEFAULt_STATUS; // 0:default 1: gateway 2:node
+volatile int gateway_node = DEFAULt_STATUS; // 0:default 1: gateway 2:node
 //Own & Deliver
 DataPackage O_Pack;
 String O_Command;
 DataPackage MQTT_Data;
-const unsigned long own_delay_send = 5000; // 5 seconds/send
 unsigned long own_wait_time = 0;
 volatile boolean sent_RTDB = false;
 //Task Delivery Data
@@ -121,7 +115,6 @@ const unsigned long long Queue_item_database_size = sizeof(DataPackage);
 //Sercurity
 boolean sercurity_backend_key = false;
 boolean tolerance_backend_key = false;
-const unsigned long reset_key_time = 300000; // 5 minutes to reset
 unsigned long before_reset_key = 0;
 //ID
 const String ID = WiFi.macAddress();
@@ -141,7 +134,7 @@ unsigned long getTime() // Get Timestamp
 }
 void Make_Day()//Counter Day
 {
-  if((unsigned long) (millis()-Time_Passed) >= A_Day_milis){
+  if((unsigned long) (millis()-Time_Passed) >= A_Day_millis){
     Time_Passed = millis();
     Tree.Days ++;
   }
@@ -152,7 +145,7 @@ void Make_Day()//Counter Day
 #pragma region Check Internet Connected from Wifi
 void PingNetwork()// Ping to host
 {
-  if(gateway_node == GATEWAYNODE::GATEWAY_STATUS){ //If it's gateway, check Internet
+  if(gateway_node == GATEWAY_STATUS){ //If it's gateway, check Internet
     if (PingClient.connect(PINGInternet, 80)) {
       ping_flag = true;
     } else {
@@ -165,7 +158,7 @@ void Cycle_Ping()// Cycle Ping to Host // FIX:
 {
   if(Last_ping_time == 0)
     Last_ping_time = millis();
-  if((unsigned long)(millis()- Last_ping_time) > time_delay_to_ping){
+  if((unsigned long)(millis()- Last_ping_time) > Five_minutes_millis){
     Last_ping_time = millis();
     PingNetwork();
   }
@@ -222,11 +215,11 @@ void Delivery(void * pvParameters)
     /*-----------------Say Hello---------------------------*/ //TODO: Test them
     if(data.GetMode() == SayHello)
     {
-      if(data.GetID() == ID)
+      if(data.GetID() == ID) //Broascast Hello
       {
         lora.sendBroadcastFixedMessage(Friend_Channel,data.toString());
         Friend_Channel = (Friend_Channel < 31)? Friend_Channel+1 : 0;
-      }else{
+      }else{ //Save ID and response Hi
         DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
         Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
         data.SetDataPackage(ID,"",String(Own_Channel),SayHi);
@@ -234,7 +227,7 @@ void Delivery(void * pvParameters)
       }
       continue;
     }
-    if(data.GetMode()== SayHi){
+    if(data.GetMode()== SayHi){ //Save ID
       Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
       continue;
     }
@@ -357,9 +350,9 @@ void Capture(void * pvParameters)
       }
       if(Receive_Pack.GetMode() == CommandDirect || Receive_Pack.GetMode() == CommandNotDirect || Receive_Pack.GetMode() == LogData) //Send ACK
       {
-        if(gateway_node == GATEWAYNODE::GATEWAY_STATUS)
+        if(gateway_node == GATEWAY_STATUS)
           ResponseACK.SetDataPackage(Receive_Pack.GetFrom(),"000017",Receive_Pack.GetMode(),"");
-        if(gateway_node == GATEWAYNODE::NODE_STATUS)
+        if(gateway_node == NODE_STATUS)
           ResponseACK.SetDataPackage(Receive_Pack.GetFrom(),Own_Adrress,Receive_Pack.GetMode(),"");
         Serial.println("Prepare to Send ACK");
         xQueueSendToFront(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
@@ -385,14 +378,14 @@ void Capture(void * pvParameters)
         }
         if(Receive_Pack.GetMode() == Default || Receive_Pack.GetMode() == LogData)//Send to gateway or database
         {
-          if(gateway_node == GATEWAYNODE::DEFAULt_STATUS)
+          if(gateway_node == DEFAULt_STATUS)
             continue;
-          if(gateway_node == GATEWAYNODE::GATEWAY_STATUS)// If it's a gateway -> Send to Database
+          if(gateway_node == GATEWAY_STATUS)// If it's a gateway -> Send to Database
           {
             xQueueSend(Queue_Database,&Receive_Pack,pdMS_TO_TICKS(10));
             continue;
           }
-          if(gateway_node == GATEWAYNODE::NODE_STATUS)//If it's a node -> Delivery to Gateway
+          if(gateway_node == NODE_STATUS)//If it's a node -> Delivery to Gateway
           {
             xQueueSend(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));
             continue;
@@ -429,8 +422,8 @@ void Init_LoRa()
     configuration.OPTION.fec = 0b1;
     configuration.OPTION.transmissionPower = 0;
     lora_flag = true;
-    if(gateway_node == GATEWAYNODE::DEFAULt_STATUS){
-      gateway_node = GATEWAYNODE::NODE_STATUS;
+    if(gateway_node == DEFAULt_STATUS){
+      gateway_node = NODE_STATUS;
     }
       
   }
@@ -498,10 +491,10 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) //Handle messa
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
     if(String((char*)data).indexOf("Username:") >= 0){
-      protect.setID(String((char*)data).substring(String((char*)data).indexOf(' ')+1,String((char*)data).length()),TypeProtect::STA);
+      protect.setID(String((char*)data).substring(String((char*)data).indexOf(' ')+1,String((char*)data).length()),STA);
     }
     if(String((char*)data).indexOf("Password:") >= 0){
-      protect.setPass(String((char*)data).substring(String((char*)data).indexOf(' ')+1,String((char*)data).length()),TypeProtect::STA);
+      protect.setPass(String((char*)data).substring(String((char*)data).indexOf(' ')+1,String((char*)data).length()),STA);
       sta_flag = true;
     }
     if(String((char*)data).indexOf("NameTree:") >= 0){
@@ -510,22 +503,22 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) //Handle messa
     if(String((char*)data).indexOf("Disconnect") >= 0){
       WiFi.disconnect(true,true);
       WiFi.mode(WIFI_AP);
-      gateway_node = GATEWAYNODE::NODE_STATUS;
+      gateway_node = NODE_STATUS;
       ping_flag = false;
       notifyClients("Wifi OFF");
       Reset_ConfigurationLoRa(false);
     }
     if(String((char*)data).indexOf("Pump") >= 0){
       if(statusActuator.PumpsStatus)
-        Command_Pump = AllStatus::OFF;
+        Command_Pump = OFF;
       else
-        Command_Pump = AllStatus::ON;
+        Command_Pump = ON;
     }
     if(String((char*)data).indexOf("LED") >= 0){
       if(statusActuator.LightStatus)
-        Command_Light = AllStatus::OFF;
+        Command_Light = OFF;
       else
-        Command_Light = AllStatus::ON;
+        Command_Light = ON;
     }
   }
 }//Handle messange from local clients
@@ -579,18 +572,18 @@ void callback(char* topic, byte *payload, unsigned int length)// Receive Messang
       if(t_ID == ID)
       {
         if(t_command == "N")
-            Command_Pump = AllStatus::ON;
+            Command_Pump = ON;
         else if(t_command == "F")
-            Command_Pump = AllStatus::OFF;
+            Command_Pump = OFF;
       }else flag = true;
     }
     if(String(topic) == MQTT_LED_TOPIC){ 
       if(t_ID == ID)
       {
         if(t_command == "N")
-            Command_Light = AllStatus::ON;
+            Command_Light = ON;
         else if(t_command == "F")
-            Command_Light = AllStatus::OFF;
+            Command_Light = OFF;
       }else flag = true;
     }
     if(flag)
@@ -643,7 +636,7 @@ void DataLog(void * pvParameters)
         time_log = getTime();
         delay(5);
       } while (time_log == 0);
-      if((unsigned long)(time_log - time_check_before_log) < (unsigned long)(time_delay_send_datalogging /1000))
+      if((unsigned long)(time_log - time_check_before_log) < (unsigned long)(Three_minutes_millis /1000))
         continue;
       Root += String(time_log);
       Root += "/";
@@ -676,11 +669,11 @@ void Setup_Server()//Initiate connection to the servers
 }
 void Connect_Network()//Connect to Wifi Router
 {
-  if(protect.getID(TypeProtect::STA)== "")
+  if(protect.getID(STA)== "")
     return;
-  WiFi.begin(protect.getID(TypeProtect::STA).c_str(), protect.getPass(TypeProtect::STA).c_str());
+  WiFi.begin(protect.getID(STA).c_str(), protect.getPass(STA).c_str());
   long current = millis();
-  while (WiFi.status() != WL_CONNECTED && (unsigned long) (millis()- current) < Network_TimeOut)
+  while (WiFi.status() != WL_CONNECTED && (unsigned long) (millis()- current) < Five_Seconds_millis)
   {
     delay(500);
   }
@@ -693,7 +686,7 @@ void Connect_Network()//Connect to Wifi Router
   }
   else
   {
-    gateway_node = GATEWAYNODE::GATEWAY_STATUS;
+    gateway_node = GATEWAY_STATUS;
     Reset_ConfigurationLoRa();
     if(Person > 0)
       notifyClients("Wifi ON");
@@ -706,7 +699,7 @@ void Reset_Key()
 {
   if(before_reset_key == 0)
     return;
-  if((unsigned long)(millis() - before_reset_key) > reset_key_time)
+  if((unsigned long)(millis() - before_reset_key) > Five_minutes_millis)
   {
     sercurity_backend_key = false;
     tolerance_backend_key = false;
@@ -718,7 +711,7 @@ void Init_Server()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     if(ON_STA_FILTER(request)) //Only for client from AP Mode
       return request->redirect("/NothingHereForYou");
-    if(!request->authenticate(protect.getID(TypeProtect::HTTP).c_str(), protect.getPass(TypeProtect::HTTP).c_str()) && !request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
+    if(!request->authenticate(protect.getID(HTTP).c_str(), protect.getPass(HTTP).c_str()) && !request->authenticate(protect.getID(AUTH).c_str(),protect.getPass(AUTH).c_str()))
       return request->requestAuthentication();
       request->send_P(Received_Code, "text/html", main_html);
   });//Home Page Server
@@ -728,19 +721,19 @@ void Init_Server()
   server.on("/Sercurity",HTTP_GET,[](AsyncWebServerRequest *request){
     if(ON_STA_FILTER(request) ) //Only for client from AP Mode
       return request->redirect("/NothingHereForYou");
-    if(request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
+    if(request->authenticate(protect.getID(AUTH).c_str(),protect.getPass(AUTH).c_str()))
     {
       sercurity_backend_key = true;
       before_reset_key = millis();
       return request->send_P(Received_Code,"text/html",Sercurity_html);
     }
-    if(request->authenticate(protect.getID(TypeProtect::HTTP).c_str(), protect.getPass(TypeProtect::HTTP).c_str()))
+    if(request->authenticate(protect.getID(HTTP).c_str(), protect.getPass(HTTP).c_str()))
       return request->send_P(Forbidden_Code,"text/html",Forbidden_html);
     return request->send_P(Not_Found_Code,"text/html",Error_html);
 
   });
   server.on("/BackEndSercure",HTTP_POST,[](AsyncWebServerRequest *request){},NULL,[](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total){
-    if(!sercurity_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
+    if(!sercurity_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(AUTH).c_str(),protect.getPass(AUTH).c_str()))
       return request->send(Gone_Code);
     sercurity_backend_key = false;
     before_reset_key = 0;
@@ -763,29 +756,29 @@ void Init_Server()
       return request->send(Bad_Request_Code);
     if(String((char*) data).indexOf("Authentication: ")>=0)
     {
-      protect.setID(TmpID,TypeProtect::HTTP);
-      protect.setPass(TmpPass,TypeProtect::HTTP);
+      protect.setID(TmpID,HTTP);
+      protect.setPass(TmpPass,HTTP);
       return request->send(No_Content_Code);
     }
     if(String((char*) data).indexOf("Authorization: ")>=0)
     {
-      protect.setID(TmpID,TypeProtect::AUTH);
-      protect.setPass(TmpPass,TypeProtect::AUTH);
+      protect.setID(TmpID,AUTH);
+      protect.setPass(TmpPass,AUTH);
       return request->send(No_Content_Code);
     }
     if(String((char*) data).indexOf("AP: ")>=0)
     {
-      protect.setID(TmpID,TypeProtect::AP);
-      protect.setPass(TmpPass,TypeProtect::AP);
+      protect.setID(TmpID,AP);
+      protect.setPass(TmpPass,AP);
       request->send(Network_Authentication_Required);
       Person = 0;
-      WiFi.softAP(protect.getID(TypeProtect::AP).c_str(),protect.getPass(TypeProtect::AP).c_str());
+      WiFi.softAP(protect.getID(AP).c_str(),protect.getPass(AP).c_str());
     }
     else
       request->send(No_Response_Code);
   });
   server.on("/BackEndSercure",HTTP_GET,[](AsyncWebServerRequest *request){
-    if(!sercurity_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
+    if(!sercurity_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(AUTH).c_str(),protect.getPass(AUTH).c_str()))
       return request->send(Gone_Code);
       char temp0[2] = { 0 };
       char temp1[1] = {0};
@@ -795,35 +788,35 @@ void Init_Server()
       sprintf(temp1,"%02x",Gateway_Channel);
       MessLimit += String(temp1);
       MessLimit += "/";
-      MessLimit += protect.getID(TypeProtect::AUTH);
+      MessLimit += protect.getID(AUTH);
       MessLimit += "/";
-      MessLimit += protect.getPass(TypeProtect::AUTH);
+      MessLimit += protect.getPass(AUTH);
       MessLimit += "/";
-      MessLimit += protect.getID(TypeProtect::HTTP);
+      MessLimit += protect.getID(HTTP);
       MessLimit += "/";
-      MessLimit += protect.getPass(TypeProtect::HTTP);
+      MessLimit += protect.getPass(HTTP);
       MessLimit += "/";
-      MessLimit += protect.getID(TypeProtect::AP);
+      MessLimit += protect.getID(AP);
       MessLimit += "/";
-      MessLimit += protect.getPass(TypeProtect::AP);
+      MessLimit += protect.getPass(AP);
       MessLimit += "/";
     return request->send_P(Received_Code,"text/plain",MessLimit.c_str());
   });
   server.on("/Tolerance",HTTP_GET,[](AsyncWebServerRequest *request){
     if(ON_STA_FILTER(request)) //Only for client from AP Mode
       return request->redirect("/NothingHereForYou");
-    if(request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
+    if(request->authenticate(protect.getID(AUTH).c_str(),protect.getPass(AUTH).c_str()))
     {
       tolerance_backend_key = true;
       before_reset_key = millis();
       return request->send_P(Received_Code,"text/html",Tolerance_html);
     }
-    if(request->authenticate(protect.getID(TypeProtect::HTTP).c_str(),protect.getPass(TypeProtect::HTTP).c_str()))
+    if(request->authenticate(protect.getID(HTTP).c_str(),protect.getPass(HTTP).c_str()))
       return request->send_P(Forbidden_Code,"text/html",Forbidden_html);
     return request->send_P(Not_Found_Code,"text/html",Error_html);
   });
   server.on("/BackEndTolerance",HTTP_POST,[](AsyncWebServerRequest *request){},NULL,[](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total){
-    if(!tolerance_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()))
+    if(!tolerance_backend_key || ON_STA_FILTER(request) || !request->authenticate(protect.getID(AUTH).c_str(),protect.getPass(AUTH).c_str()))
       return request->send(Gone_Code);
     String Filter = String((char*) data).substring(String((char*) data).indexOf('{')+1,String((char*) data).indexOf('}'));
     Tree.Danger_Temp = atof(Filter.substring(0,Filter.indexOf('/')).c_str());
@@ -844,7 +837,7 @@ void Init_Server()
     before_reset_key = 0;
   });
   server.on("/BackEndTolerance",HTTP_GET,[](AsyncWebServerRequest *request){
-    if(!request->authenticate(protect.getID(TypeProtect::AUTH).c_str(),protect.getPass(TypeProtect::AUTH).c_str()) || !tolerance_backend_key)
+    if(!request->authenticate(protect.getID(AUTH).c_str(),protect.getPass(AUTH).c_str()) || !tolerance_backend_key)
       return request->send_P(Forbidden_Code,"text/html",Forbidden_html);
     MessLimit = String(Tree.Danger_Temp);
     MessLimit += "/";
@@ -977,21 +970,21 @@ void SendMess() //Send mess prepared to who
   if(Person>0 && valueChange_flag) //Send thourgh WebSocket
     notifyClients(messanger);
   
-  if(((unsigned long)(millis()- Last_datalogging_time)>time_delay_send_datalogging)||Last_datalogging_time == 0)
+  if(((unsigned long)(millis()- Last_datalogging_time)>Three_minutes_millis)||Last_datalogging_time == 0)
   {
-    if(((!ping_flag || first_sta) && (gateway_node != GATEWAYNODE::NODE_STATUS)))
+    if(((!ping_flag || first_sta) && (gateway_node != NODE_STATUS)))
       return;
-    if(Firebase.ready() || gateway_node == GATEWAYNODE::NODE_STATUS)
+    if(Firebase.ready() || gateway_node == NODE_STATUS)
     {
       Last_datalogging_time = millis();
       own_wait_time = millis(); //Renew realtime send
       O_Pack.SetDataPackage(ID,"",messanger,LogData);
       switch (gateway_node)
       {
-      case GATEWAYNODE::GATEWAY_STATUS: // Gateway -> Database
+      case GATEWAY_STATUS: // Gateway -> Database
         xQueueSend(Queue_Database,&O_Pack,pdMS_TO_TICKS(10));
         break;
-      case GATEWAYNODE::NODE_STATUS: //Node -> Gateway
+      case NODE_STATUS: //Node -> Gateway
         xQueueSend(Queue_Delivery,&O_Pack,pdMS_TO_TICKS(10));
         break;
       default:
@@ -1004,7 +997,7 @@ void SendMess() //Send mess prepared to who
     if(valueChange_flag)
     {
       O_Pack.SetDataPackage(ID,"",messanger,Default);
-      if(!sent_RTDB && gateway_node == GATEWAYNODE::NODE_STATUS && ((unsigned long)(millis() - own_wait_time)>own_delay_send )) //Send to Gateway only if It's a node
+      if(!sent_RTDB && gateway_node == NODE_STATUS && ((unsigned long)(millis() - own_wait_time)>Five_Seconds_millis )) //Send to Gateway only if It's a node
       {
         own_wait_time = millis();
         xQueueSend(Queue_Delivery,&O_Pack,pdMS_TO_TICKS(10));
@@ -1025,10 +1018,10 @@ void Hello_Around()
     Wait_to_Hello = millis();
     return;
   }
-  if((unsigned long)(millis()-Wait_to_Hello)> Delay_Hello_Message)
+  if((unsigned long)(millis()-Wait_to_Hello)> Five_minutes_millis)
   {
     if(Friend_Channel >= 0 && Friend_Channel <= 31){
-      if(gateway_node == GATEWAYNODE::GATEWAY_STATUS)
+      if(gateway_node == GATEWAY_STATUS)
         Hello_Message.SetDataPackage("","000017","","");
       else
         Hello_Message.SetDataPackage("",Own_address,"","");
@@ -1076,9 +1069,9 @@ void Check()// Check error sensor
 }
 void Read_Sensor()//Get Data from All Sensors
 {
-  dataSensor.lumen = Get_Sensor(PORT::LDR_Port);
+  dataSensor.lumen = Get_Sensor(LDR_Port);
   delay(500);
-  dataSensor.soilMoist = Get_Sensor(PORT::Soil_Moisture_Port);
+  dataSensor.soilMoist = Get_Sensor(Soil_Moisture_Port);
   delay(500);
   if(!statusActuator.PumpsStatus)
   {
@@ -1093,66 +1086,66 @@ void Read_Sensor()//Get Data from All Sensors
 void Condition_Pump()//Check watering conditions
 {
   //Condition & Error || Time until Pump || Current Command
-  if((((dataSensor.soilMoist < Tree.DRY_SOIL || dataSensor.Humidity < Tree.Save_Humi ) && !Err ||(unsigned long)(millis()-Times_Pumps) >= Next_Pump) || Command_Pump == AllStatus::ON) && !statusActuator.PumpsStatus) //Đang tắt
+  if((((dataSensor.soilMoist < Tree.DRY_SOIL || dataSensor.Humidity < Tree.Save_Humi ) && !Err ||(unsigned long)(millis()-Times_Pumps) >= Half_Day_millis) || Command_Pump == ON) && !statusActuator.PumpsStatus) //Đang tắt
   {
     Times_Pumps = millis();
     statusActuator.PumpsStatus = true;
-    if(Command_Pump == AllStatus::OFF)
-      Command_Pump = AllStatus::NOTHING;
-    if(Command_Pump == AllStatus::ON)
+    if(Command_Pump == OFF)
+      Command_Pump = NOTHING;
+    if(Command_Pump == ON)
       return;
   }
   //Condition & Error || Time until Stop || Current Command
-  if((((dataSensor.Temperature >= Tree.Danger_Temp || dataSensor.Temperature <= Tree.Save_Temp || dataSensor.Humidity >= Tree.Danger_Humi  || dataSensor.soilMoist > Tree.WET_SOIL) && !Err || ((unsigned long)(millis()- Times_Pumps) >= Still_Pumps)) || Command_Pump == AllStatus::OFF) && statusActuator.PumpsStatus) //Đang bật
+  if((((dataSensor.Temperature >= Tree.Danger_Temp || dataSensor.Temperature <= Tree.Save_Temp || dataSensor.Humidity >= Tree.Danger_Humi  || dataSensor.soilMoist > Tree.WET_SOIL) && !Err || ((unsigned long)(millis()- Times_Pumps) >= Still_Pumps)) || Command_Pump == OFF) && statusActuator.PumpsStatus) //Đang bật
   {
     Times_Pumps = millis(); 
     statusActuator.PumpsStatus = false;
-    if(Command_Pump == AllStatus::ON)
-      Command_Pump = AllStatus::NOTHING;
-    if(Command_Pump ==AllStatus::OFF)
+    if(Command_Pump == ON)
+      Command_Pump = NOTHING;
+    if(Command_Pump ==OFF)
       return;
   }
 }
 void Pump()//Pump Choice
 {
-  if(Err && Command_Pump == AllStatus::NOTHING)
+  if(Err && Command_Pump == NOTHING)
     statusActuator.PumpsStatus = false;
   else
     Condition_Pump();
   if(statusActuator.PumpsStatus)
-    digitalWrite(PORT::Pumps_Port,HIGH);
+    digitalWrite(Pumps_Port,HIGH);
   else 
-    digitalWrite(PORT::Pumps_Port,LOW);
+    digitalWrite(Pumps_Port,LOW);
 }
 void Condition_Light()//Check lighting up conditions
 {
-  if((dataSensor.lumen <= Tree.DARK_LIGHT && !Err ||  Command_Light == AllStatus::ON )&& !statusActuator.LightStatus) //Đang tắt
+  if((dataSensor.lumen <= Tree.DARK_LIGHT && !Err ||  Command_Light == ON )&& !statusActuator.LightStatus) //Đang tắt
     {
       statusActuator.LightStatus = true;
-      if(Command_Light == AllStatus::OFF)
-        Command_Light = AllStatus::NOTHING;
-      if(Command_Light == AllStatus::ON)
+      if(Command_Light == OFF)
+        Command_Light = NOTHING;
+      if(Command_Light == ON)
         return;
     }
-  if((dataSensor.lumen > Tree.DARK_LIGHT && !Err || Command_Light == AllStatus::OFF) && statusActuator.LightStatus) // Đang bật
+  if((dataSensor.lumen > Tree.DARK_LIGHT && !Err || Command_Light == OFF) && statusActuator.LightStatus) // Đang bật
     {
       statusActuator.LightStatus = false;
-      if(Command_Light == AllStatus::ON)
-        Command_Light = AllStatus::NOTHING;
-      if(Command_Light ==AllStatus::OFF)
+      if(Command_Light == ON)
+        Command_Light = NOTHING;
+      if(Command_Light ==OFF)
         return;
     }
 }
 void Light_Up()//Light up choice
 {
-  if(Err && Command_Light == AllStatus::NOTHING)
+  if(Err && Command_Light == NOTHING)
     statusActuator.LightStatus = false;
   else
     Condition_Light();
   if(statusActuator.LightStatus)
-    digitalWrite(PORT::Light_Port,HIGH);
+    digitalWrite(Light_Port,HIGH);
   else 
-    digitalWrite(PORT::Light_Port,LOW);
+    digitalWrite(Light_Port,LOW);
 }
 #pragma endregion
 #pragma region Main System
@@ -1165,17 +1158,17 @@ void Solve_Command()
     if(Actuator == "L")
     {
       if(Require == "N")
-          Command_Light = AllStatus::ON;
+          Command_Light = ON;
       else if(Require == "F")
-          Command_Light = AllStatus::OFF;
+          Command_Light = OFF;
       return;
     }
     if(Actuator == "P")
     {
       if(Require == "N")
-          Command_Pump = AllStatus::ON;
+          Command_Pump = ON;
       else if(Require == "F")
-          Command_Pump = AllStatus::OFF;
+          Command_Pump = OFF;
       return;
     }
   }
@@ -1256,16 +1249,16 @@ void setup()
   Init_LoRa();
   Init_Task();
   initWebSocket();
-  pinMode(PORT::Pumps_Port,OUTPUT);
-  pinMode(PORT::Light_Port,OUTPUT);
-  digitalWrite(PORT::Pumps_Port,LOW);
-  digitalWrite(PORT::Light_Port,LOW);
+  pinMode(Pumps_Port,OUTPUT);
+  pinMode(Light_Port,OUTPUT);
+  digitalWrite(Pumps_Port,LOW);
+  digitalWrite(Light_Port,LOW);
   dht.begin();
   Time_Passed = millis();
   WiFi.mode(WIFI_AP_STA);
   Init_Server();
   protect.AppendIDAP(ID);
-  WiFi.softAP(protect.getID(TypeProtect::AP).c_str(), protect.getPass(TypeProtect::AP).c_str());
+  WiFi.softAP(protect.getID(AP).c_str(), protect.getPass(AP).c_str());
   InitPackage();
   Connect_Network();
 }
