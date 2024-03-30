@@ -202,10 +202,11 @@ void Delivery(void * pvParameters)
   uint8_t DeliveryL;
   uint8_t DeliveryChan;
   Remember Locate;
+  int Preventive_Channel = 0; //FIXME: Channel Init ?
   while(true)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
-    Serial.print(data.toString(true));
+    //Serial.print(data.toString(true));
     /*----------------------Memorize---------------------------*/
     if(data.GetMode() == Memorize)
     {
@@ -215,12 +216,19 @@ void Delivery(void * pvParameters)
     /*-----------------Say Hello---------------------------*/ //TODO: Test them
     if(data.GetMode() == SayHello)
     {
+      //Serial.print(data.toString(true));
       if(data.GetID() == ID) //Broascast Hello
       {
+        Serial.println("Say Hello");
         lora.sendBroadcastFixedMessage(Friend_Channel,data.toString());
-        Friend_Channel = (Friend_Channel < 31)? Friend_Channel+1 : 0;
+        Serial.print("Channel: ");
+        Serial.println(Friend_Channel);
+        Friend_Channel = Locate.GetNextChannelFriend(Friend_Channel,true); 
       }else{ //Save ID and response Hi
+        Serial.println("Response Hello");
         DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
+        Serial.println(data.GetID());
+        Serial.println(atoi(data.GetData().c_str()));
         Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
         data.SetDataPackage(ID,"",String(Own_Channel),SayHi);
         lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
@@ -228,6 +236,9 @@ void Delivery(void * pvParameters)
       continue;
     }
     if(data.GetMode()== SayHi){ //Save ID
+      Serial.println("Say Hi");
+      Serial.println(data.GetID());
+      Serial.println(atoi(data.GetData().c_str()));
       Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
       continue;
     }
@@ -282,10 +293,10 @@ void Delivery(void * pvParameters)
       if(data.GetMode() == CommandDirect || data.GetMode() == CommandNotDirect)
         xQueueSendToBack(Queue_Delivery,&data,pdMS_TO_TICKS(10));
     }
-    Serial.print("Delivery Task: ");
-    uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-    Serial.println(uxHighWaterMark);
-    Serial.println();
+    // Serial.print("Delivery Task: ");
+    // uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+    // Serial.println(uxHighWaterMark);
+    // Serial.println();
     delay(3000);
   }
 }
@@ -308,11 +319,14 @@ void Capture(void * pvParameters)
     if(lora.available()>1)
     {
       mess = lora.receiveMessageUntil();
+      // Serial.println(Receive_Pack.fromString(mess.data));
+      // Serial.println(Receive_Pack.GetID().length());
+      // Serial.println(Receive_Pack.GetFrom().length());
       if(!Receive_Pack.fromString(mess.data))
-        continue;
-      Serial.print(ID);
-      Serial.println(" receive:");
-      Serial.println(Receive_Pack.toString(true));
+         continue;
+      // Serial.print(ID);
+      // Serial.println(" receive:");
+      // Serial.println(Receive_Pack.toString(true));
       /*------------------------Say Hi------------------------*/
       if(Receive_Pack.GetMode() == SayHello || Receive_Pack.GetMode() == SayHi){
         xQueueSendToFront(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));
@@ -1018,7 +1032,7 @@ void Hello_Around()
     Wait_to_Hello = millis();
     return;
   }
-  if((unsigned long)(millis()-Wait_to_Hello)> Five_minutes_millis)
+  if( Friend_Channel != -1 && ((unsigned long)(millis()-Wait_to_Hello)> Five_minutes_millis))
   {
     if(Friend_Channel >= 0 && Friend_Channel <= 31){
       if(gateway_node == GATEWAY_STATUS)
@@ -1029,8 +1043,6 @@ void Hello_Around()
     }
     Wait_to_Hello = millis();
   }
-
-
   
 }
 #pragma endregion Send Message
@@ -1182,7 +1194,7 @@ void Init_Task()
   xTaskCreate(
     Delivery,
     "Delivery",
-    5000, //3634B left
+    6000, //4100B left
     NULL,
     0,
     &DeliveryTask
@@ -1198,7 +1210,7 @@ void Init_Task()
   xTaskCreate(
     Capture,
     "Capture",
-    5000, //?B left
+    6000, //4628B left
     (void*)&Own_address,
     0,
     &CaptureTask

@@ -38,4 +38,5 @@ public:
     bool AddFriend(const String ID = "",const int channel = -1);
     void RemoveFriend(const int channel = -1);
     String GetFriend(const int channel = -1) const;
+    const int GetNextChannelFriend(const int CurrentChannel = -1, bool freeRoom = false);
 };

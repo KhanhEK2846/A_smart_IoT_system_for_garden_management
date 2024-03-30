@@ -91,7 +91,7 @@ const String Remember::GetAddress(const String ID)
 bool Remember::AddFriend(const String ID,const int channel){
     if(ID == "" || channel == -1 || channel > 31)
         return false;
-    if(friends[channel].friendID != ""){
+    if(friends[channel].friendID == ""){
         friends[channel].friendID = ID;
         return true;
     }
@@ -108,4 +108,20 @@ String Remember::GetFriend(const int channel) const{
     if(channel == -1 || channel > 31)
         return "";
     return friends[channel].friendID;
+}
+
+const int Remember::GetNextChannelFriend(const int CurrentChannel, bool freeRoom){
+    if (CurrentChannel == -1 || CurrentChannel > 31)
+        return -1;
+    flag = CurrentChannel;
+    while(true){
+        flag = (flag < 31)? flag+1:0;
+        
+        if(freeRoom && friends[flag].friendID == "")
+            return flag;
+        if(!freeRoom && friends[flag].friendID != "")
+            return flag;
+        if(flag == CurrentChannel)
+            return -1;
+    }
 }
