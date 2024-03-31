@@ -44,8 +44,6 @@ unsigned long Time_Passed = 0;
 unsigned long Times_Pumps=0;
 unsigned long Still_Pumps = 30000; //Water in 1 minute
 ActuatorStatus statusActuator;
-//Bits -> int
-int ConvertToInt = 0; //DHT_Err LDR_Err Soil_Err LightStatus PumpsStatus
 //WIFI Variable
 Protection protect;
 //LoRa Variable
@@ -202,7 +200,8 @@ void Delivery(void * pvParameters)
   uint8_t DeliveryL;
   uint8_t DeliveryChan;
   Remember Locate;
-  int Preventive_Channel = 0; //FIXME: Channel Init ?
+  int Preventive_Channel = 0;
+  String Preventive_ID = "";
   while(true)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
@@ -219,27 +218,29 @@ void Delivery(void * pvParameters)
       //Serial.print(data.toString(true));
       if(data.GetID() == ID) //Broascast Hello
       {
-        Serial.println("Say Hello");
         lora.sendBroadcastFixedMessage(Friend_Channel,data.toString());
-        Serial.print("Channel: ");
-        Serial.println(Friend_Channel);
+        // Serial.println("Say Hello");
+        // Serial.print("Channel: ");
+        // Serial.println(Friend_Channel);
         Friend_Channel = Locate.GetNextChannelFriend(Friend_Channel,true); 
       }else{ //Save ID and response Hi
-        Serial.println("Response Hello");
         DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
-        Serial.println(data.GetID());
-        Serial.println(atoi(data.GetData().c_str()));
+        // Serial.println("Response Hello");
+        // Serial.println(data.GetID());
+        // Serial.println(atoi(data.GetData().c_str()));
         Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
         data.SetDataPackage(ID,"",String(Own_Channel),SayHi);
         lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
+        Preventive_Channel = 0;
       }
       continue;
     }
     if(data.GetMode()== SayHi){ //Save ID
-      Serial.println("Say Hi");
-      Serial.println(data.GetID());
-      Serial.println(atoi(data.GetData().c_str()));
+      // Serial.println("Say Hi");
+      // Serial.println(data.GetID());
+      // Serial.println(atoi(data.GetData().c_str()));
       Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
+      Preventive_Channel = 0;
       continue;
     }
     /*-----------------Check Expired---------------------------*/  
@@ -264,6 +265,18 @@ void Delivery(void * pvParameters)
         Gateway_AddL = 0;
         Gateway_Channel = 0x17;
         continue;
+        // Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel);
+        // if(Preventive_Channel == -1) //None Firend
+        // {
+        //   Gateway_AddH = 0;
+        //   Gateway_AddL = 0;
+        //   Gateway_Channel = 0x17;
+        //   continue;
+        // }else{
+        //   Preventive_ID = Locate.GetFriend(Preventive_Channel);
+        //   CalculateAddressChannel(Preventive_ID,DeliveryH,DeliveryL,DeliveryChan);
+        // }
+        // continue;
       }
     };
     /*--------------------------------------------------------*/
@@ -893,13 +906,7 @@ void PrepareMess() //Decide what to send
   messanger.clear();
   messanger = Tree.Name;
   messanger += "/";
-  ConvertToInt = 0;
-  ConvertToInt |= dataSensor.DHT_Err <<4;
-  ConvertToInt |= dataSensor.LDR_Err <<3;
-  ConvertToInt |= dataSensor.Soil_Err <<2;
-  ConvertToInt |= statusActuator.LightStatus <<1;
-  ConvertToInt |= statusActuator.PumpsStatus <<0;
-  messanger += String(ConvertToInt);
+  messanger += BoolToInt(dataSensor.DHT_Err,dataSensor.LDR_Err,dataSensor.Soil_Err,statusActuator.LightStatus,statusActuator.PumpsStatus);
   messanger += "/";
   if(dataSensor.DHT_Err)
     messanger += String(0);

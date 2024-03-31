@@ -29,3 +29,14 @@ String CalculateToEncode(const String id)
   CalculateAddressChannel(id,H,L,chan);
   return EnCodeAddressChannel(H,L,chan);
 }
+
+String BoolToInt(bool DHT,bool LDR, bool Soil, bool Light, bool Pump)
+{
+  int ConvertToInt = 0; //DHT_Err LDR_Err Soil_Err LightStatus PumpsStatus
+  ConvertToInt |= DHT <<4;
+  ConvertToInt |= LDR <<3;
+  ConvertToInt |= Soil <<2;
+  ConvertToInt |= Light <<1;
+  ConvertToInt |= Pump <<0;
+  return String(ConvertToInt);
+}
