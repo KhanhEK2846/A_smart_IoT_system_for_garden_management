@@ -39,4 +39,5 @@ public:
     void RemoveFriend(const int channel = -1);
     String GetFriend(const int channel = -1) const;
     const int GetNextChannelFriend(const int CurrentChannel = -1, bool freeRoom = false);
+    const bool IsFriend(const uint8_t H,const uint8_t L,const uint8_t chan);
 };

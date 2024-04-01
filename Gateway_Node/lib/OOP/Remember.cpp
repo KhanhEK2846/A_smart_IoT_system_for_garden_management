@@ -125,3 +125,15 @@ const int Remember::GetNextChannelFriend(const int CurrentChannel, bool freeRoom
             return -1;
     }
 }
+
+const bool Remember::IsFriend(const uint8_t H,const uint8_t L,const uint8_t chan){
+    if(chan < 0 || chan >31)
+        return false;
+    uint8_t tmp_H = 0;
+    uint8_t tmp_L = 0;
+    uint8_t tmp_chan = 0;
+    CalculateAddressChannel(friends[chan].friendID,tmp_H,tmp_L,tmp_chan);
+    if(tmp_H==H && tmp_L==L && tmp_chan==chan)
+        return true;
+    return false;
+}

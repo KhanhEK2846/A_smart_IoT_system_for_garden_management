@@ -264,22 +264,25 @@ void Delivery(void * pvParameters)
       }
       if(data.GetMode() == LogData) //TODO: Using Friend Around 
       {
-        Gateway_AddH = 0;
-        Gateway_AddL = 0;
-        Gateway_Channel = 0x17;
+        /*----------------------------------Remove if it a friend--------------------------------------*/
+        if(Locate.IsFriend(Gateway_AddH,Gateway_AddL,Gateway_Channel))
+          Locate.RemoveFriend(Gateway_Channel);
+        /*-------------------------------Routing friend Router---------------------------------------------*/
+        Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel); // Be locked if return -1
+        if(Preventive_Channel == -1) //None Firend
+        {
+          Gateway_AddH = 0;
+          Gateway_AddL = 0;
+          Gateway_Channel = 0x17;
+          continue;
+        }else{
+          Preventive_ID = Locate.GetFriend(Preventive_Channel);
+          CalculateAddressChannel(Preventive_ID,DeliveryH,DeliveryL,DeliveryChan);
+          Gateway_AddH = DeliveryH;
+          Gateway_AddL = DeliveryL;
+          Gateway_Channel = DeliveryChan;
+        }
         continue;
-        // Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel); // Be locked if return -1
-        // if(Preventive_Channel == -1) //None Firend
-        // {
-        //   Gateway_AddH = 0;
-        //   Gateway_AddL = 0;
-        //   Gateway_Channel = 0x17;
-        //   continue;
-        // }else{
-        //   Preventive_ID = Locate.GetFriend(Preventive_Channel);
-        //   CalculateAddressChannel(Preventive_ID,DeliveryH,DeliveryL,DeliveryChan);
-        // }
-        // continue;
       }
     };
     /*--------------------------------------------------------*/
