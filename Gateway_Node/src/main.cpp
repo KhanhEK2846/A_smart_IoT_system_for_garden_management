@@ -121,7 +121,8 @@ String Actuator = "";
 String Require = "";
 // Store Recent Value
 int TempData[11] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-#pragma region Common Function
+/*-------------------------------------Get Real World Time------------------------------------------------*/
+#pragma region Current Time
 unsigned long getTime() // Get Timestamp
 { 
   time_t now; 
@@ -140,6 +141,7 @@ void Make_Day()//Counter Day
     Tree.Days = 0;
 }
 #pragma endregion
+/*-------------------------------------Ping Network-------------------------------------------------------*/
 #pragma region Check Internet Connected from Wifi
 void PingNetwork()// Ping to host
 {
@@ -162,6 +164,7 @@ void Cycle_Ping()// Cycle Ping to Host // FIX:
   }
 }
 #pragma endregion
+/*---------------------------------------LoRa SetUP-------------------------------------------------------*/
 #pragma region LoRa
 void Reset_ConfigurationLoRa(boolean gateway = true)
 {
@@ -231,7 +234,7 @@ void Delivery(void * pvParameters)
         Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
         data.SetDataPackage(ID,"",String(Own_Channel),SayHi);
         lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
-        Preventive_Channel = 0;
+        Preventive_Channel = 0; //Unlock Get Friend Address
       }
       continue;
     }
@@ -240,7 +243,7 @@ void Delivery(void * pvParameters)
       // Serial.println(data.GetID());
       // Serial.println(atoi(data.GetData().c_str()));
       Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
-      Preventive_Channel = 0;
+      Preventive_Channel = 0; //Unlock Get Friend Address
       continue;
     }
     /*-----------------Check Expired---------------------------*/  
@@ -265,7 +268,7 @@ void Delivery(void * pvParameters)
         Gateway_AddL = 0;
         Gateway_Channel = 0x17;
         continue;
-        // Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel);
+        // Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel); // Be locked if return -1
         // if(Preventive_Channel == -1) //None Firend
         // {
         //   Gateway_AddH = 0;
@@ -370,11 +373,6 @@ void Capture(void * pvParameters)
         }
         continue;//No mess fit ack
       }
-      if(Receive_Pack.GetFrom() != CalculateToEncode(Receive_Pack.GetID())) //Ignore Send From Direct
-      {
-        Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),"","");
-        xQueueSendToFront(Queue_Delivery,&Memory_Pack,pdMS_TO_TICKS(10));
-      }
       if(Receive_Pack.GetMode() == CommandDirect || Receive_Pack.GetMode() == CommandNotDirect || Receive_Pack.GetMode() == LogData) //Send ACK
       {
         if(gateway_node == GATEWAY_STATUS)
@@ -383,6 +381,12 @@ void Capture(void * pvParameters)
           ResponseACK.SetDataPackage(Receive_Pack.GetFrom(),Own_Adrress,Receive_Pack.GetMode(),"");
         Serial.println("Prepare to Send ACK");
         xQueueSendToFront(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
+      }
+      /*-------------------------------Save for Routing Table---------------------------------*/
+      if(Receive_Pack.GetFrom() != CalculateToEncode(Receive_Pack.GetID())) //Ignore Send From Direct
+      {
+        Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),"","");
+        xQueueSendToFront(Queue_Delivery,&Memory_Pack,pdMS_TO_TICKS(10));
       }
       /*------------------------Itself or other-----------------*/  
       if(Receive_Pack.GetID() == ID) //If message for node 
@@ -460,7 +464,8 @@ void Init_LoRa()
   }
   c.close();
 }
-#pragma endregion LoRa
+#pragma endregion
+/*---------------------------------------------WebSocket SetUp--------------------------------------------*/
 #pragma region WebSocket Protocol
 void notifyClients(const String data) //Notify all local clients with a message
 {
@@ -573,6 +578,7 @@ void initWebSocket() //Initialize the WebSocket protocol
   server.addHandler(&ws);
 }
 #pragma endregion
+/*------------------------------------------MQTT SetUp----------------------------------------------------*/
 #pragma region MQTT Protocol
 void connect_to_broker() // Connect to the broker
 {
@@ -591,35 +597,38 @@ void connect_to_broker() // Connect to the broker
 }
 void callback(char* topic, byte *payload, unsigned int length)// Receive Messange From Broker
 {
-    MQTT_Messange = String((char*)payload).substring(String((char*)payload).indexOf("{")+1,String((char*)payload).indexOf("}"));
-    String t_ID = MQTT_Messange.substring(0,MQTT_Messange.indexOf("/"));
-    String t_command = MQTT_Messange.substring(MQTT_Messange.indexOf(" ")+1,MQTT_Messange.length());
-    boolean flag = false;
-    if(String(topic) == MQTT_Pump_TOPIC){ 
-      if(t_ID == ID)
-      {
-        if(t_command == "N")
-            Command_Pump = ON;
-        else if(t_command == "F")
-            Command_Pump = OFF;
-      }else flag = true;
-    }
-    if(String(topic) == MQTT_LED_TOPIC){ 
-      if(t_ID == ID)
-      {
-        if(t_command == "N")
-            Command_Light = ON;
-        else if(t_command == "F")
-            Command_Light = OFF;
-      }else flag = true;
-    }
-    if(flag)
-    {    
-      MQTT_Data.SetDataPackage(t_ID,"",MQTT_Messange.substring(MQTT_Messange.indexOf("/")+1,MQTT_Messange.length()),CommandDirect);
-      xQueueSend(Queue_Delivery,&MQTT_Data,pdMS_TO_TICKS(10));
-    }
+  if(String((char*)payload).indexOf("{") == -1 || String((char*)payload).lastIndexOf("}") == -1) //Filter Message From Server
+    return;
+  MQTT_Messange = String((char*)payload).substring(String((char*)payload).indexOf("{")+1,String((char*)payload).indexOf("}"));
+  String t_ID = MQTT_Messange.substring(0,MQTT_Messange.indexOf("/"));
+  String t_command = MQTT_Messange.substring(MQTT_Messange.indexOf(" ")+1,MQTT_Messange.length());
+  boolean flag = false;
+  if(String(topic) == MQTT_Pump_TOPIC){ 
+    if(t_ID == ID)
+    {
+      if(t_command == "N")
+          Command_Pump = ON;
+      else if(t_command == "F")
+          Command_Pump = OFF;
+    }else flag = true;
+  }
+  if(String(topic) == MQTT_LED_TOPIC){ 
+    if(t_ID == ID)
+    {
+      if(t_command == "N")
+          Command_Light = ON;
+      else if(t_command == "F")
+          Command_Light = OFF;
+    }else flag = true;
+  }
+  if(flag)
+  {    
+    MQTT_Data.SetDataPackage(t_ID,"",MQTT_Messange.substring(MQTT_Messange.indexOf("/")+1,MQTT_Messange.length()),CommandDirect);
+    xQueueSend(Queue_Delivery,&MQTT_Data,pdMS_TO_TICKS(10));
+  }
 }
 #pragma endregion
+/*-----------------------------------------Cloud Database SetUp-------------------------------------------*/
 #pragma region Cloud Database
 void DataLog(void * pvParameters)
 {
@@ -682,6 +691,7 @@ void Setup_RTDB()//Initiate Realtime Database Firebase
   firebaseData.setResponseSize(4096);
 }
 #pragma endregion
+/*-----------------------------------------WiFi SetUp-----------------------------------------------------*/
 #pragma region Network
 void Setup_Server()//Initiate connection to the servers
 {
@@ -894,6 +904,7 @@ void Init_Server()
   server.begin();
 }
 #pragma endregion
+/*-----------------------------------------------Message Prepare------------------------------------------*/
 #pragma region Send Message
 void InitPackage()
 {
@@ -1052,7 +1063,8 @@ void Hello_Around()
   }
   
 }
-#pragma endregion Send Message
+#pragma endregion
+/*------------------------------------------Read Environment----------------------------------------------*/
 #pragma region Sensor Data Read
 int Get_Sensor(int anaPin)// Get Data From Light Sensor & Soild Sensor
 {
@@ -1101,6 +1113,7 @@ void Read_Sensor()//Get Data from All Sensors
   Check();
 }
 #pragma endregion
+/*--------------------------------------------Controling--------------------------------------------------*/
 #pragma region Controlled Things
 void Condition_Pump()//Check watering conditions
 {
@@ -1167,6 +1180,7 @@ void Light_Up()//Light up choice
     digitalWrite(Light_Port,LOW);
 }
 #pragma endregion
+/*----------------------------------------------Main Task-------------------------------------------------*/
 #pragma region Main System
 void Solve_Command()
 {
@@ -1260,6 +1274,7 @@ void Auto()//Auto Part
   Light_Up();
 }
 #pragma endregion
+/*------------------------------------Arduino Platform----------------------------------------------------*/
 #pragma region Arduino program structure
 void setup() 
 {
