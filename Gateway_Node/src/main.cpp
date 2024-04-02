@@ -386,7 +386,7 @@ void Capture(void * pvParameters)
         xQueueSendToFront(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
       }
       /*-------------------------------Save for Routing Table---------------------------------*/
-      if(Receive_Pack.GetFrom() != CalculateToEncode(Receive_Pack.GetID())) //Ignore Send From Direct
+      if( Receive_Pack.GetID() != ID && Receive_Pack.GetFrom() != CalculateToEncode(Receive_Pack.GetID())) //Ignore Send From Direct
       {
         Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),"","");
         xQueueSendToFront(Queue_Delivery,&Memory_Pack,pdMS_TO_TICKS(10));

@@ -7,9 +7,9 @@ void CalculateAddressChannel(const String id, uint8_t &H, uint8_t &L, uint8_t &c
 	H = tempid[0] + tempid[1] + tempid[2];
 	L = tempid[3] + tempid[4] + tempid[5];
 	chan = tempid[0] + tempid[1] + tempid[2] + tempid[3] + tempid[4] + tempid[5];
-  while(H > 0xFF) H -= 0xFF;
-  while(L > 0xFF) L -= 0xFF;
-  while(chan > 0x1F) chan -= 0x1F;
+  while(H > 0xFF) H -= 0x100;
+  while(L > 0xFF) L -= 0x100;
+  while(chan > 0x1F) chan -= 0x20;
 }
 String EnCodeAddressChannel(const uint8_t H,const uint8_t L,const uint8_t chan)
 {

@@ -36,9 +36,9 @@ public class ToolSlove {
         AddL = (num[3]+ num[4]+num[5])&255;
         Channel = (num[0]+ num[1]+num[2]+num[3]+ num[4]+num[5])&255;
 
-        while(AddH > 255) AddH -= 255;
-        while(AddL > 255) AddL -= 255;
-        while(Channel > 31) Channel -= 31;
+        while(AddH > 255) AddH -= 256;
+        while(AddL > 255) AddL -= 256;
+        while(Channel > 31) Channel -= 32;
 
     }
 }
