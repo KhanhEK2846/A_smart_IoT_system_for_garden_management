@@ -13,6 +13,7 @@
 
 /*----------------------------ACK-----------------------------------------*/
 #define ACK "0" // Send ACK
+#define PrepareACK "8"
 /*-----------------------Node -> Gateway----------------------------------*/
 #define Default "1" //Node -> Gateway
 #define LogData "4" //Log to Database

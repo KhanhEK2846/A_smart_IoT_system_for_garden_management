@@ -198,6 +198,7 @@ void Reset_ConfigurationLoRa(boolean gateway = true)
 void Delivery(void * pvParameters)
 {
   DataPackage data;
+  DataPackage tempData;
   UBaseType_t uxHighWaterMark;
   uint8_t DeliveryH;
   uint8_t DeliveryL;
@@ -209,6 +210,24 @@ void Delivery(void * pvParameters)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
     //Serial.print(data.toString(true));
+    /*------------------------Response------------------------*/
+    if(data.GetMode() == ACK) //Receive ACK
+    {
+      Serial.println("Receive ACK");
+      for(int i = 0; i<Queue_Length;i++) //Find the data for that ACK
+      {
+        xQueueReceive(Queue_Delivery,&tempData,portMAX_DELAY);
+        
+        if(data.GetID() == tempData.GetID() && data.GetData() == tempData.GetMode() && data.GetFrom() == tempData.GetFrom())
+        {
+          Serial.println("Remove Message");
+          break;
+        }
+        xQueueSend(Queue_Delivery,&tempData,portMAX_DELAY);
+
+      }
+      continue;//No mess fit ack
+    }
     /*----------------------Memorize---------------------------*/
     if(data.GetMode() == Memorize)
     {
@@ -251,6 +270,7 @@ void Delivery(void * pvParameters)
     /*-----------------Check Expired---------------------------*/  
     if(data.expired == 0)
     {
+      Serial.println("Expired");
       if(data.GetMode() == CommandNotDirect) // Remove ID From Memory
       {
         Locate.RemoveAddress(data.GetID());
@@ -259,8 +279,12 @@ void Delivery(void * pvParameters)
       if(data.GetMode() == CommandDirect)
       {
         data.NotDirect = Locate.GetAddress(data.GetID());
-        if(data.NotDirect == "")
+        if(data.NotDirect == "") // Not found
           continue; //TODO: Solution for ID not found
+        if(data.NotDirect == CalculateToEncode(data.GetID())){ // From and ID belong to same node
+          Locate.RemoveAddress(data.GetID());
+          continue;
+        }
         data.ResetExpired();
         data.SetMode(CommandNotDirect); //Direct -> Not Direct
       }
@@ -293,13 +317,19 @@ void Delivery(void * pvParameters)
         sent_RTDB = false;
       lora.sendFixedMessage(Gateway_AddH,Gateway_AddL,Gateway_Channel,data.toString());
       data.expired--;
-      if(data.GetMode() == LogData)
+      if(data.GetMode() == LogData){
         xQueueSendToBack(Queue_Delivery,&data,pdMS_TO_TICKS(10));
+        delay(1000);
+      }
     }
     else //Send to Node
     {
-      if(data.GetMode() == ACK)
-        DeCodeAddressChannel(data.GetID(),DeliveryH,DeliveryL,DeliveryChan);
+      if(data.GetMode() == PrepareACK)
+      {
+        data.SetMode(ACK);
+        DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
+      }
+        
       else if(data.GetMode() == CommandNotDirect)
       {
         DeCodeAddressChannel(data.NotDirect,DeliveryH,DeliveryL,DeliveryChan);
@@ -310,8 +340,10 @@ void Delivery(void * pvParameters)
       lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
 
       data.expired--;
-      if(data.GetMode() == CommandDirect || data.GetMode() == CommandNotDirect)
+      if(data.GetMode() == CommandDirect || data.GetMode() == CommandNotDirect){
         xQueueSendToBack(Queue_Delivery,&data,pdMS_TO_TICKS(10));
+        delay(1000);
+      }
     }
     // Serial.print("Delivery Task: ");
     // uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
@@ -325,13 +357,12 @@ void Capture(void * pvParameters)
   ResponseContainer mess;
   UBaseType_t uxHighWaterMark;
   DataPackage ResponseACK;
-  DataPackage tempData;
   String TempAddress = "";
   DataPackage Receive_Pack;
   DataPackage Memory_Pack;
   String D_Command;
   Memory_Pack.SetMode(Memorize);
-  ResponseACK.SetMode(ACK);
+  ResponseACK.SetMode(PrepareACK);
   const String Own_Adrress = *((String*)pvParameters);
   while (true)
   {
@@ -341,47 +372,21 @@ void Capture(void * pvParameters)
       mess = lora.receiveMessageUntil();
       if(!Receive_Pack.fromString(mess.data))
          continue;
+      Serial.println("Receive: ");
+      Serial.println(Receive_Pack.toString(true));
       /*------------------------Say Hi------------------------*/
-      if(Receive_Pack.GetMode() == SayHello || Receive_Pack.GetMode() == SayHi){
+      if(Receive_Pack.GetMode() == SayHello || Receive_Pack.GetMode() == SayHi || Receive_Pack.GetMode() == ACK){
         xQueueSendToFront(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));
         continue;
       }
-      /*------------------------Response------------------------*/
-      if(Receive_Pack.GetMode() == ACK) //Receive ACK
-      {
-        Serial.println("Receive ACK");
-        for(int i = 0; i<Queue_Length;i++) //Find the data for that ACK
-        {
-          if(xQueueReceive(Queue_Delivery,&tempData,0) == pdPASS)
-          {
-            if(Receive_Pack.GetID() == tempData.GetFrom() && Receive_Pack.GetData() == tempData.GetMode())
-            {
-              if(Receive_Pack.GetData() == LogData)
-                TempAddress = EnCodeAddressChannel(Gateway_AddH,Gateway_AddL,Gateway_Channel);
-              else
-                TempAddress = CalculateToEncode(tempData.GetID());
-              if(Receive_Pack.GetFrom() == TempAddress)
-              {
-                break;
-              }
-            }
-            xQueueSend(Queue_Delivery,&tempData,0);
-          }
-          else break; //Empty Queue
-        }
-        continue;//No mess fit ack
-      }
       if(Receive_Pack.GetMode() == CommandDirect || Receive_Pack.GetMode() == CommandNotDirect || Receive_Pack.GetMode() == LogData) //Send ACK
       {
-        if(gateway_node == GATEWAY_STATUS)
-          ResponseACK.SetDataPackage(Receive_Pack.GetFrom(),"000017",Receive_Pack.GetMode(),"");
-        if(gateway_node == NODE_STATUS)
-          ResponseACK.SetDataPackage(Receive_Pack.GetFrom(),Own_Adrress,Receive_Pack.GetMode(),"");
+        ResponseACK.SetDataPackage(Receive_Pack.GetID(), Receive_Pack.GetFrom(),Receive_Pack.GetMode(),"");
         Serial.println("Prepare to Send ACK");
         xQueueSendToFront(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
       }
       /*-------------------------------Save for Routing Table---------------------------------*/
-      if( Receive_Pack.GetID() != ID && Receive_Pack.GetMode() != CommandDirect && Receive_Pack.GetMode() != CommandNotDirect) //Ignore saveing routing from Server to Node
+      if(Receive_Pack.GetMode() != CommandDirect && Receive_Pack.GetMode() != CommandNotDirect) //Ignore saveing routing from Server to Node
       {
         Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),"","");
         xQueueSendToFront(Queue_Delivery,&Memory_Pack,pdMS_TO_TICKS(10));

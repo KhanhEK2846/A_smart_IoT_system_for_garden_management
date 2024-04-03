@@ -7,7 +7,7 @@ DataPackage ::DataPackage()
     NotDirect = "";
     From = "";
     Mode = "";
-    expired = 4;
+    expired = 9;
 }
 
 String DataPackage:: GetID() const
@@ -134,12 +134,7 @@ void DataPackage::DataToJson(FirebaseJson* slave)
 }
 
 boolean DataPackage::CheckFormat(){
-    if(this->Mode == "0"){ //If ACK package
-        if(this->ID.length() == 6 && this->From.length() == 6) return true;
-    }
-    else{
-        if(this->ID.length() == 17 && this->From.length() == 6) return true;
-    }
+    if(this->ID.length() == 17 && this->From.length() == 6) return true;
     return false;
 }
 
@@ -159,5 +154,5 @@ boolean DataPackage::fromString(const String data)
 
 void DataPackage::ResetExpired()
 {
-    this->expired = 4;
+    this->expired = 9;
 }
