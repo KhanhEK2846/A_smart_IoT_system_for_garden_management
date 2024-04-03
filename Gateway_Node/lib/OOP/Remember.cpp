@@ -139,3 +139,17 @@ const bool Remember::IsFriend(const uint8_t H,const uint8_t L,const uint8_t chan
         return true;
     return false;
 }
+
+const bool Remember::IsFriend(const String ID){
+    if(ID== "")
+        return false;
+    if(friends[CalculateChannel(ID)].friendID == ID)
+        return true;
+    return false;
+}
+
+const bool Remember::IsOnAddress(const String friendID){
+    if(GetAddress(friendID) == "")
+        return false;
+    return true;
+}

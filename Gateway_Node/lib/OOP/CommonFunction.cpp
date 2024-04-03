@@ -11,6 +11,14 @@ void CalculateAddressChannel(const String id, uint8_t &H, uint8_t &L, uint8_t &c
   while(L > 0xFF) L -= 0x100;
   while(chan > 0x1F) chan -= 0x20;
 }
+uint8_t CalculateChannel(const String id)
+{
+  int tempid[6];
+  sscanf(id.c_str(), "%02x:%02x:%02x:%02x:%02x:%02x", &tempid[0], &tempid[1], &tempid[2], &tempid[3], &tempid[4], &tempid[5]);
+  uint8_t chan = tempid[0] + tempid[1] + tempid[2] + tempid[3] + tempid[4] + tempid[5];
+  while(chan > 0x1F) chan -= 0x20;
+  return chan;
+}
 String EnCodeAddressChannel(const uint8_t H,const uint8_t L,const uint8_t chan)
 {
   char macStr[3] = { 0 };

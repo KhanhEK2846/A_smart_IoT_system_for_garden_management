@@ -274,7 +274,6 @@ void Delivery(void * pvParameters)
           Gateway_AddH = 0;
           Gateway_AddL = 0;
           Gateway_Channel = 0x17;
-          continue;
         }else{
           Preventive_ID = Locate.GetFriend(Preventive_Channel);
           CalculateAddressChannel(Preventive_ID,DeliveryH,DeliveryL,DeliveryChan);
