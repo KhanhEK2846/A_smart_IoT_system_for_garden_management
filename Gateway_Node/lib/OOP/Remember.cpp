@@ -75,21 +75,22 @@ const String Remember::GetAddress(const String ID)
 {
     if(ID == "")
         return "";
-    else
+    
+    for(flag = 0;flag <10; flag++)
     {
-        for(flag = 0;flag <10; flag++)
-        {
-            if(data[flag].ID == ID)
-                return data[flag].NodeAdrress;
-            if(data[flag].ID == "")
-                break;
-        }
+        if(data[flag].ID == ID)
+            return data[flag].NodeAdrress;
+        if(data[flag].ID == "")
+            break;
     }
+
     return "";
 }
 
 bool Remember::AddFriend(const String ID,const int channel){
     if(ID == "" || channel == -1 || channel > 31)
+        return false;
+    if(!IsOnAddress(ID)) // Not save if already on routing table
         return false;
     if(friends[channel].friendID == ""){
         friends[channel].friendID = ID;
@@ -149,7 +150,16 @@ const bool Remember::IsFriend(const String ID){
 }
 
 const bool Remember::IsOnAddress(const String friendID){
-    if(GetAddress(friendID) == "")
+    if(friendID == "")
         return false;
-    return true;
+
+    for(flag = 0;flag <10; flag++)
+    {
+        if(data[flag].ID == friendID)
+            return true;
+        if(data[flag].ID == "")
+            break;
+    }
+    
+    return false;
 }
