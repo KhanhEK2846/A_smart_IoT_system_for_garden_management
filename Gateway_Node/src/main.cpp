@@ -339,14 +339,8 @@ void Capture(void * pvParameters)
     if(lora.available()>1)
     {
       mess = lora.receiveMessageUntil();
-      // Serial.println(Receive_Pack.fromString(mess.data));
-      // Serial.println(Receive_Pack.GetID().length());
-      // Serial.println(Receive_Pack.GetFrom().length());
       if(!Receive_Pack.fromString(mess.data))
          continue;
-      // Serial.print(ID);
-      // Serial.println(" receive:");
-      // Serial.println(Receive_Pack.toString(true));
       /*------------------------Say Hi------------------------*/
       if(Receive_Pack.GetMode() == SayHello || Receive_Pack.GetMode() == SayHi){
         xQueueSendToFront(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));
@@ -387,7 +381,7 @@ void Capture(void * pvParameters)
         xQueueSendToFront(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
       }
       /*-------------------------------Save for Routing Table---------------------------------*/
-      if( Receive_Pack.GetID() != ID)
+      if( Receive_Pack.GetID() != ID && Receive_Pack.GetMode() != CommandDirect && Receive_Pack.GetMode() != CommandNotDirect) //Ignore saveing routing from Server to Node
       {
         Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),"","");
         xQueueSendToFront(Queue_Delivery,&Memory_Pack,pdMS_TO_TICKS(10));
