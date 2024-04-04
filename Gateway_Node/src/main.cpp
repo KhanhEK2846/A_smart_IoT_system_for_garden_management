@@ -225,7 +225,10 @@ void Delivery(void * pvParameters)
     {
       Locate.AddAddress(data.GetID(),data.GetFrom());
       if(Locate.IsFriend(data.GetID())) // Remove friend
+      {
         Locate.RemoveFriend(CalculateChannel(data.GetID()));
+        Friend_Channel = (Friend_Channel == -1)? 0:Friend_Channel; //Unlock Auto Detect Friend Node
+      }
       continue;
     }
     /*-----------------Say Hello---------------------------*/ //TODO: Test them
@@ -238,7 +241,7 @@ void Delivery(void * pvParameters)
         // Serial.println("Say Hello");
         // Serial.print("Channel: ");
         // Serial.println(Friend_Channel);
-        Friend_Channel = Locate.GetNextChannelFriend(Friend_Channel,true); 
+        Friend_Channel = Locate.GetNextChannelFriend(Friend_Channel,true); //Lock if return -1
       }else{ //Save ID and response Hi
         DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
         // Serial.println("Response Hello");
@@ -283,8 +286,10 @@ void Delivery(void * pvParameters)
       if(data.GetMode() == LogData) //TODO: Using Friend Around 
       {
         /*----------------------------------Remove if it a friend--------------------------------------*/
-        if(Locate.IsFriend(Gateway_AddH,Gateway_AddL,Gateway_Channel))
+        if(Locate.IsFriend(Gateway_AddH,Gateway_AddL,Gateway_Channel)){
           Locate.RemoveFriend(Gateway_Channel);
+          Friend_Channel = (Friend_Channel == -1)? 0:Friend_Channel; //Unlock Auto Detect Friend Node
+        }
         /*-------------------------------Routing friend Router---------------------------------------------*/
         Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel); // Be locked if return -1
         if(Preventive_Channel == -1) //None Firend
@@ -1080,7 +1085,7 @@ void PostponeSend(void * pvParameters)
   while(true){
     xQueueReceive(Queue_ReSend,&data,portMAX_DELAY);
     xQueueSend(Queue_Delivery,&data,pdMS_TO_TICKS(10));
-    delay(5000);
+    delay(7500);
   }
 }
 #pragma endregion
