@@ -20,6 +20,20 @@ FriendAround::~FriendAround(){
     friendID.remove(0);
 }
 
+ACKstorage::ACKstorage()
+{
+    ID = "";
+    From = "";
+    Mode = "";
+}
+
+ACKstorage::~ACKstorage()
+{
+    ID.remove(0);
+    From.remove(0);
+    Mode.remove(0);
+}
+
 Remember::Remember()
 {
     flag = 0;
@@ -162,4 +176,57 @@ const bool Remember::IsOnAddress(const String friendID){
     }
     
     return false;
+}
+
+bool Remember::AddACK(const String ID, const String From, const String Mode){
+    if(ID == "" || From =="" || Mode == "")
+        return false;
+    for(flag = 0; flag<20;flag++)
+    {
+        if(ACK[flag].ID == ID && ACK[flag].From == From && ACK[flag].Mode == Mode) //Update from
+            return true;
+        if(ACK[flag].ID == "")
+            break;
+    }
+    if(flag == 20) // Full ACK -> Remove the first ACK
+    {
+        RemoveACK(0);
+        flag --;
+    }
+    ACK[flag].ID = ID;
+    ACK[flag].From = From;
+    ACK[flag].Mode = Mode;
+    return true;
+}
+
+int Remember::IsACK(const String ID, const String From, const String Mode){
+    if(ID == "" || From =="" || Mode == "")
+        return -1;
+    for(flag = 0; flag<20;flag++)
+    {
+        if(ACK[flag].ID == ID && ACK[flag].From == From && ACK[flag].Mode == Mode) //Update from
+            return flag;
+        if(ACK[flag].ID == "")
+            break;
+    }
+    return -1;
+}
+
+void Remember::RemoveACK(int Location){
+    if(Location == -1 || Location >= 20)
+        return;
+    for(flag = Location; flag <20; flag++){
+        if(ACK[flag].ID == "")
+            return;
+        if(flag == 19){
+            ACK[flag].ID = "";
+            ACK[flag].From = "";
+            ACK[flag].Mode = "";
+        }else{
+            ACK[flag].ID = ACK[flag+1].ID;
+            ACK[flag].From = ACK[flag+1].From;
+            ACK[flag].Mode = ACK[flag+1].Mode;
+        }
+
+    }
 }

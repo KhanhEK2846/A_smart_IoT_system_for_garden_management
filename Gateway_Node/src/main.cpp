@@ -103,9 +103,11 @@ volatile boolean sent_RTDB = false;
 TaskHandle_t DeliveryTask = NULL;
 TaskHandle_t DatabaseTask = NULL;
 TaskHandle_t CaptureTask = NULL;
+TaskHandle_t ReSendTask = NULL;
 QueueHandle_t Queue_Delivery = NULL;
 QueueHandle_t Queue_Command = NULL;
 QueueHandle_t Queue_Database = NULL;
+QueueHandle_t Queue_ReSend = NULL;
 const int Queue_Length = 10;
 const unsigned long long Queue_item_delivery_size = sizeof(DataPackage);
 const unsigned long long Queue_item_command_size = sizeof(String);
@@ -206,6 +208,7 @@ void Delivery(void * pvParameters)
   Remember Locate;
   int Preventive_Channel = 0;
   String Preventive_ID = "";
+  int ACK_Locate = -1;
   while(true)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
@@ -214,18 +217,7 @@ void Delivery(void * pvParameters)
     if(data.GetMode() == ACK) //Receive ACK
     {
       Serial.println("Receive ACK");
-      for(int i = 0; i<Queue_Length;i++) //Find the data for that ACK
-      {
-        xQueueReceive(Queue_Delivery,&tempData,portMAX_DELAY);
-        
-        if(data.GetID() == tempData.GetID() && data.GetData() == tempData.GetMode() && data.GetFrom() == tempData.GetFrom())
-        {
-          Serial.println("Remove Message");
-          break;
-        }
-        xQueueSend(Queue_Delivery,&tempData,portMAX_DELAY);
-
-      }
+      Locate.AddACK(data.GetID(),data.GetFrom(),data.GetData());
       continue;//No mess fit ack
     }
     /*----------------------Memorize---------------------------*/
@@ -315,15 +307,32 @@ void Delivery(void * pvParameters)
     {
       if(data.GetMode() == Default && data.GetID() == ID)
         sent_RTDB = false;
+      if(data.GetMode() == LogData && data.expired < 9){
+        ACK_Locate = Locate.IsACK(data.GetID(),data.GetFrom(),data.GetMode());
+        if(ACK_Locate != -1)
+        {
+          Locate.RemoveACK(ACK_Locate);
+          Serial.println("Remove Message Log");
+          continue;
+        }
+      }
       lora.sendFixedMessage(Gateway_AddH,Gateway_AddL,Gateway_Channel,data.toString());
       data.expired--;
       if(data.GetMode() == LogData){
-        xQueueSendToBack(Queue_Delivery,&data,pdMS_TO_TICKS(10));
-        delay(1000);
+        xQueueSend(Queue_ReSend,&data,pdMS_TO_TICKS(10));
       }
     }
     else //Send to Node
     {
+      if((data.GetMode() == CommandDirect || data.GetMode() == CommandNotDirect) && data.expired < 9){
+        ACK_Locate = Locate.IsACK(data.GetID(),data.GetFrom(),data.GetMode());
+        if(ACK_Locate != -1)
+        {
+          Locate.RemoveACK(ACK_Locate);
+          Serial.println("Remove Message Command");
+          continue;
+        }
+      }
       if(data.GetMode() == PrepareACK)
       {
         data.SetMode(ACK);
@@ -341,8 +350,7 @@ void Delivery(void * pvParameters)
 
       data.expired--;
       if(data.GetMode() == CommandDirect || data.GetMode() == CommandNotDirect){
-        xQueueSendToBack(Queue_Delivery,&data,pdMS_TO_TICKS(10));
-        delay(1000);
+        xQueueSend(Queue_ReSend,&data,pdMS_TO_TICKS(10));
       }
     }
     // Serial.print("Delivery Task: ");
@@ -1066,6 +1074,15 @@ void Hello_Around()
   }
   
 }
+void PostponeSend(void * pvParameters)
+{
+  DataPackage data;
+  while(true){
+    xQueueReceive(Queue_ReSend,&data,portMAX_DELAY);
+    xQueueSend(Queue_Delivery,&data,pdMS_TO_TICKS(10));
+    delay(5000);
+  }
+}
 #pragma endregion
 /*------------------------------------------Read Environment----------------------------------------------*/
 #pragma region Sensor Data Read
@@ -1215,6 +1232,7 @@ void Init_Task()
   Queue_Delivery = xQueueCreate(Queue_Length,Queue_item_delivery_size+1);
   Queue_Command = xQueueCreate(Queue_Length,Queue_item_command_size+1);
   Queue_Database = xQueueCreate(Queue_Length,Queue_item_database_size+1);
+  Queue_ReSend = xQueueCreate(Queue_Length,Queue_item_delivery_size+1);
   xTaskCreate(
     Delivery,
     "Delivery",
@@ -1226,7 +1244,7 @@ void Init_Task()
   xTaskCreate(
     DataLog,
     "DataLog",
-    8000,//1972B left
+    8000,//1964B left
     NULL,
     0,
     &DatabaseTask
@@ -1238,6 +1256,14 @@ void Init_Task()
     (void*)&Own_address,
     0,
     &CaptureTask
+  );
+  xTaskCreate(
+    PostponeSend,
+    "PostponeSend",
+    6000,
+    NULL,
+    0,
+    &ReSendTask
   );
 }
 void Network()// Netword Part
