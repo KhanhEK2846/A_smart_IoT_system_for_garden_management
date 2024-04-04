@@ -1080,7 +1080,7 @@ void PostponeSend(void * pvParameters)
   while(true){
     xQueueReceive(Queue_ReSend,&data,portMAX_DELAY);
     xQueueSend(Queue_Delivery,&data,pdMS_TO_TICKS(10));
-    delay(5000);
+    delay(7500);
   }
 }
 #pragma endregion

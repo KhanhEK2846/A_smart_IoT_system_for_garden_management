@@ -104,7 +104,7 @@ const String Remember::GetAddress(const String ID)
 bool Remember::AddFriend(const String ID,const int channel){
     if(ID == "" || channel == -1 || channel > 31)
         return false;
-    if(!IsOnAddress(ID)) // Not save if already on routing table
+    if(IsOnAddress(ID)) // Not save if already on routing table
         return false;
     if(friends[channel].friendID == ""){
         friends[channel].friendID = ID;
