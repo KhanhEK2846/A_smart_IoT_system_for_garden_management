@@ -387,6 +387,9 @@ void Capture(void * pvParameters)
          continue;
       Serial.println("Receive: ");
       Serial.println(Receive_Pack.toString(true));
+      /*-------------------------Prohibit situation---------------------------*/
+      if(Receive_Pack.GetID() == ID && (Receive_Pack.GetMode() == LogData || Receive_Pack.GetMode() == Default)) //Impossible to reveive a package of it which's made by it
+        continue;//Ignore package to force node which send package change Gateway Channel
       /*------------------------Say Hi------------------------*/
       if(Receive_Pack.GetMode() == SayHello || Receive_Pack.GetMode() == SayHi || Receive_Pack.GetMode() == ACK){
         xQueueSendToFront(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));
