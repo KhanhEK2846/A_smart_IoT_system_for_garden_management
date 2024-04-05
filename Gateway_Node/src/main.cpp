@@ -207,7 +207,6 @@ void Delivery(void * pvParameters)
   uint8_t DeliveryChan;
   Remember Locate;
   int Preventive_Channel = 0;
-  String Preventive_ID = "";
   int ACK_Locate = -1;
   while(true)
   {
@@ -226,11 +225,12 @@ void Delivery(void * pvParameters)
       Locate.AddAddress(data.GetID(),data.GetFrom());
       if(Locate.IsFriend(data.GetID())) // Remove friend
       {
-        int tmpChannel = CalculateChannel(data.GetID());
+        int tmpChannel = CalculateChannel(data.GetID()); //Get Channel of this ID from receive package
         Friend_Channel = (Friend_Channel == -1)? 0:Friend_Channel; //Unlock Auto Detect Friend Node
-        CalculateAddressChannel(Locate.GetFriend(tmpChannel),DeliveryH,DeliveryL,DeliveryChan);
+        CalculateAddressChannel(Locate.GetFriend(tmpChannel),DeliveryH,DeliveryL,DeliveryChan);// Get Address and Channel of friend
         Locate.RemoveFriend(tmpChannel);
-        if(DeliveryH == Gateway_AddH && DeliveryL == Gateway_AddL && DeliveryChan == Gateway_Channel){//In case Friend already used
+        /*------------------------------If only current Gateway is used this Friend--------------------------------*/
+        if(DeliveryH == Gateway_AddH && DeliveryL == Gateway_AddL && DeliveryChan == Gateway_Channel){
           Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel); // Be locked if return -1
           if(Preventive_Channel == -1) //None Firend
           {
@@ -238,8 +238,7 @@ void Delivery(void * pvParameters)
             Gateway_AddL = 0;
             Gateway_Channel = 0x17;
           }else{
-            Preventive_ID = Locate.GetFriend(Preventive_Channel);
-            CalculateAddressChannel(Preventive_ID,DeliveryH,DeliveryL,DeliveryChan);
+            CalculateAddressChannel(Locate.GetFriend(Preventive_Channel),DeliveryH,DeliveryL,DeliveryChan);
             Gateway_AddH = DeliveryH;
             Gateway_AddL = DeliveryL;
             Gateway_Channel = DeliveryChan;
@@ -315,8 +314,7 @@ void Delivery(void * pvParameters)
           Gateway_AddL = 0;
           Gateway_Channel = 0x17;
         }else{
-          Preventive_ID = Locate.GetFriend(Preventive_Channel);
-          CalculateAddressChannel(Preventive_ID,DeliveryH,DeliveryL,DeliveryChan);
+          CalculateAddressChannel(Locate.GetFriend(Preventive_Channel),DeliveryH,DeliveryL,DeliveryChan);
           Gateway_AddH = DeliveryH;
           Gateway_AddL = DeliveryL;
           Gateway_Channel = DeliveryChan;
