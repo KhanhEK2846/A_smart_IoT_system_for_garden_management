@@ -247,10 +247,10 @@ void Delivery(void * pvParameters)
         // Serial.println("Response Hello");
         // Serial.println(data.GetID());
         // Serial.println(atoi(data.GetData().c_str()));
-        Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
+        if(Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str())))
+          Preventive_Channel = (Preventive_Channel == -1)? 0:Preventive_Channel; //Unlock Get Friend Address
         data.SetDataPackage(ID,"",String(Own_Channel),SayHi);
         lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
-        Preventive_Channel = 0; //Unlock Get Friend Address
       }
       continue;
     }
@@ -258,8 +258,8 @@ void Delivery(void * pvParameters)
       // Serial.println("Say Hi");
       // Serial.println(data.GetID());
       // Serial.println(atoi(data.GetData().c_str()));
-      Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str()));
-      Preventive_Channel = 0; //Unlock Get Friend Address
+      if(Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str())))
+        Preventive_Channel = (Preventive_Channel == -1)? 0:Preventive_Channel; //Unlock Get Friend Address
       continue;
     }
     /*-----------------Check Expired---------------------------*/  
