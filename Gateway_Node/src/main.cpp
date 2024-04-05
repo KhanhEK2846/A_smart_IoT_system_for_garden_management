@@ -226,8 +226,25 @@ void Delivery(void * pvParameters)
       Locate.AddAddress(data.GetID(),data.GetFrom());
       if(Locate.IsFriend(data.GetID())) // Remove friend
       {
-        Locate.RemoveFriend(CalculateChannel(data.GetID()));
+        int tmpChannel = CalculateChannel(data.GetID());
         Friend_Channel = (Friend_Channel == -1)? 0:Friend_Channel; //Unlock Auto Detect Friend Node
+        CalculateAddressChannel(Locate.GetFriend(tmpChannel),DeliveryH,DeliveryL,DeliveryChan);
+        Locate.RemoveFriend(tmpChannel);
+        if(DeliveryH == Gateway_AddH && DeliveryL == Gateway_AddL && DeliveryChan == Gateway_Channel){//In case Friend already used
+          Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel); // Be locked if return -1
+          if(Preventive_Channel == -1) //None Firend
+          {
+            Gateway_AddH = 0;
+            Gateway_AddL = 0;
+            Gateway_Channel = 0x17;
+          }else{
+            Preventive_ID = Locate.GetFriend(Preventive_Channel);
+            CalculateAddressChannel(Preventive_ID,DeliveryH,DeliveryL,DeliveryChan);
+            Gateway_AddH = DeliveryH;
+            Gateway_AddL = DeliveryL;
+            Gateway_Channel = DeliveryChan;
+          }
+        }
       }
       continue;
     }
