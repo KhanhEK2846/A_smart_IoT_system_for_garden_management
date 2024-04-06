@@ -220,49 +220,60 @@ void Delivery(void * pvParameters)
       continue;//No mess fit ack
     }
     /*----------------------Memorize---------------------------*/
-    if(data.GetMode() == Memorize)
+    if(data.GetMode() == Memorize) //BUG: There is a realtime bug in here
     {
-      Locate.AddAddress(data.GetID(),data.GetFrom());
-      if(Locate.IsFriend(data.GetID())) // Remove friend
-      {
-        int tmpChannel = CalculateChannel(data.GetID()); //Get Channel of this ID from receive package
-        Friend_Channel = (Friend_Channel == -1)? 0:Friend_Channel; //Unlock Auto Detect Friend Node
-        CalculateAddressChannel(Locate.GetFriend(tmpChannel),DeliveryH,DeliveryL,DeliveryChan);// Get Address and Channel of friend
-        Locate.RemoveFriend(tmpChannel);
-        /*------------------------------If only current Gateway is used this Friend--------------------------------*/
-        if(DeliveryH == Gateway_AddH && DeliveryL == Gateway_AddL && DeliveryChan == Gateway_Channel){
-          Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel); // Be locked if return -1
-          if(Preventive_Channel == -1) //None Firend
-          {
-            Gateway_AddH = 0;
-            Gateway_AddL = 0;
-            Gateway_Channel = 0x17;
-          }else{
-            CalculateAddressChannel(Locate.GetFriend(Preventive_Channel),DeliveryH,DeliveryL,DeliveryChan);
-            Gateway_AddH = DeliveryH;
-            Gateway_AddL = DeliveryL;
-            Gateway_Channel = DeliveryChan;
+      if(data.GetMode() == CommandDirect || data.GetMode() == CommandNotDirect){ //Save in Friend
+        Serial.println("Saving to Friend");
+        Locate.RemoveRouteViaFrom(data.GetFrom());
+        if(Locate.AddFriend(data.GetFrom(),CalculateChannel(data.GetFrom()))){
+          Preventive_Channel = (Preventive_Channel == -1)? 0:Preventive_Channel; //Unlock Get Friend Address
+          Serial.println("Save friend successfully");
+        }
+      }else{ //Save in Routing
+        Serial.println("Saving to Routing");
+        Locate.AddRoute(data.GetID(),data.GetFrom());
+        if(Locate.IsFriend(data.GetID())) // Remove friend
+        {
+          int tmpChannel = CalculateChannel(data.GetID()); //Get Channel of this ID from receive package
+          Friend_Channel = (Friend_Channel == -1)? 0:Friend_Channel; //Unlock Auto Detect Friend Node
+          DeCodeAddressChannel(Locate.GetFriend(tmpChannel),DeliveryH,DeliveryL,DeliveryChan);// Get Address and Channel of friend
+          Locate.RemoveFriend(tmpChannel);
+          /*------------------------------If only current Gateway is used this Friend--------------------------------*/
+          if(DeliveryH == Gateway_AddH && DeliveryL == Gateway_AddL && DeliveryChan == Gateway_Channel){
+            Preventive_Channel = Locate.GetNextChannelFriend(Preventive_Channel); // Be locked if return -1
+            if(Preventive_Channel == -1) //None Firend
+            {
+              Gateway_AddH = 0;
+              Gateway_AddL = 0;
+              Gateway_Channel = 0x17;
+            }else{
+              DeCodeAddressChannel(Locate.GetFriend(Preventive_Channel),DeliveryH,DeliveryL,DeliveryChan);
+              Gateway_AddH = DeliveryH;
+              Gateway_AddL = DeliveryL;
+              Gateway_Channel = DeliveryChan;
+            }
           }
         }
       }
+
       continue;
     }
-    /*-----------------Say Hello---------------------------*/ //TODO: Test them
+    /*-----------------Say Hello---------------------------*/
     if(data.GetMode() == SayHello)
     {
       //Serial.print(data.toString(true));
       if(data.GetID() == ID) //Broascast Hello
       {
         lora.sendBroadcastFixedMessage(Friend_Channel,data.toString());
-        // Serial.println("Say Hello");
-        // Serial.print("Channel: ");
-        // Serial.println(Friend_Channel);
+        Serial.println("Say Hello");
+        Serial.print("Channel: ");
+        Serial.println(Friend_Channel);
         Friend_Channel = Locate.GetNextChannelFriend(Friend_Channel,true); //Lock if return -1
       }else{ //Save ID and response Hi
         DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
-        // Serial.println("Response Hello");
-        // Serial.println(data.GetID());
-        // Serial.println(atoi(data.GetData().c_str()));
+        Serial.println("Response Hello");
+        Serial.println(data.GetID());
+        Serial.println(atoi(data.GetData().c_str()));
         if(Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str())))
           Preventive_Channel = (Preventive_Channel == -1)? 0:Preventive_Channel; //Unlock Get Friend Address
         data.SetDataPackage(ID,"",String(Own_Channel),SayHi);
@@ -271,9 +282,9 @@ void Delivery(void * pvParameters)
       continue;
     }
     if(data.GetMode()== SayHi){ //Save ID
-      // Serial.println("Say Hi");
-      // Serial.println(data.GetID());
-      // Serial.println(atoi(data.GetData().c_str()));
+      Serial.println("Say Hi");
+      Serial.println(data.GetID());
+      Serial.println(atoi(data.GetData().c_str()));
       if(Locate.AddFriend(data.GetID(),atoi(data.GetData().c_str())))
         Preventive_Channel = (Preventive_Channel == -1)? 0:Preventive_Channel; //Unlock Get Friend Address
       continue;
@@ -284,22 +295,22 @@ void Delivery(void * pvParameters)
       Serial.println("Expired");
       if(data.GetMode() == CommandNotDirect) // Remove ID From Memory
       {
-        Locate.RemoveAddress(data.GetID());
+        Locate.RemoveRoute(data.GetID());
         continue;
       }
       if(data.GetMode() == CommandDirect)
       {
-        data.NotDirect = Locate.GetAddress(data.GetID());
+        data.NotDirect = Locate.GetRoute(data.GetID());
         if(data.NotDirect == "") // Not found
           continue; //TODO: Solution for ID not found
         if(data.NotDirect == CalculateToEncode(data.GetID())){ // From and ID belong to same node
-          Locate.RemoveAddress(data.GetID());
+          Locate.RemoveRoute(data.GetID());
           continue;
         }
         data.ResetExpired();
         data.SetMode(CommandNotDirect); //Direct -> Not Direct
       }
-      if(data.GetMode() == LogData) //TODO: Using Friend Around 
+      if(data.GetMode() == LogData)
       {
         /*----------------------------------Remove if it a friend--------------------------------------*/
         if(Locate.IsFriend(Gateway_AddH,Gateway_AddL,Gateway_Channel)){
@@ -314,7 +325,7 @@ void Delivery(void * pvParameters)
           Gateway_AddL = 0;
           Gateway_Channel = 0x17;
         }else{
-          CalculateAddressChannel(Locate.GetFriend(Preventive_Channel),DeliveryH,DeliveryL,DeliveryChan);
+          DeCodeAddressChannel(Locate.GetFriend(Preventive_Channel),DeliveryH,DeliveryL,DeliveryChan);
           Gateway_AddH = DeliveryH;
           Gateway_AddL = DeliveryL;
           Gateway_Channel = DeliveryChan;
@@ -417,11 +428,8 @@ void Capture(void * pvParameters)
         xQueueSendToFront(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
       }
       /*-------------------------------Save for Routing Table---------------------------------*/
-      if(Receive_Pack.GetMode() != CommandDirect && Receive_Pack.GetMode() != CommandNotDirect) //Ignore saveing routing from Server to Node
-      {
-        Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),"","");
-        xQueueSendToFront(Queue_Delivery,&Memory_Pack,pdMS_TO_TICKS(10));
-      }
+      Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),"","");
+      xQueueSendToFront(Queue_Delivery,&Memory_Pack,pdMS_TO_TICKS(10));
       /*------------------------Itself or other-----------------*/  
       if(Receive_Pack.GetID() == ID) //If message for node 
       {
@@ -1084,7 +1092,7 @@ void Hello_Around()
     Wait_to_Hello = millis();
     return;
   }
-  if( Friend_Channel != -1 && ((unsigned long)(millis()-Wait_to_Hello)> Five_minutes_millis))
+  if( Friend_Channel != -1 && ((unsigned long)(millis()-Wait_to_Hello)> Five_Seconds_millis))
   {
     if(Friend_Channel >= 0 && Friend_Channel <= 31){
       if(gateway_node == GATEWAY_STATUS)

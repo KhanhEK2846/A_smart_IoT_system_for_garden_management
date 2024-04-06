@@ -429,7 +429,7 @@
     },
     "node-red-dashboard": {
         "name": "node-red-dashboard",
-        "version": "3.6.2",
+        "version": "3.6.5",
         "local": true,
         "user": true,
         "nodes": {
@@ -687,7 +687,7 @@
     },
     "@gogovega/node-red-contrib-firebase-realtime-database": {
         "name": "@gogovega/node-red-contrib-firebase-realtime-database",
-        "version": "0.5.4",
+        "version": "0.5.5",
         "local": true,
         "user": true,
         "nodes": {
@@ -901,7 +901,7 @@
     },
     "node-red-node-email": {
         "name": "node-red-node-email",
-        "version": "2.2.0",
+        "version": "2.2.1",
         "local": true,
         "user": true,
         "nodes": {

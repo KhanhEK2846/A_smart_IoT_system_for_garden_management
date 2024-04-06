@@ -45,17 +45,23 @@ private:
 public:
     Remember();
     ~Remember();
-    bool AddAddress(const String ID = "", const String From = "");
-    void RemoveAddress(const String ID = "");
-    const String GetAddress(const String ID = "");
+    bool AddRoute(const String ID = "", const String From = "");
+    void RemoveRoute(const String ID = "");
+    void RemoveRouteViaFrom(const String From = "");
+    int IsFromOfRoute(const String From = "");
+    const String GetRoute(const String ID = "");
     bool AddFriend(const String ID = "",const int channel = -1);
     void RemoveFriend(const int channel = -1);
     String GetFriend(const int channel = -1) const;
     const int GetNextChannelFriend(const int CurrentChannel = -1, bool freeRoom = false);
     const bool IsFriend(const uint8_t H,const uint8_t L,const uint8_t chan);
     const bool IsFriend(const String ID = "");
-    const bool IsOnAddress(const String friendID = "");
+    const bool IsOnRoute(const String friendID = "");
     bool AddACK(const String ID = "", const String From = "", const String Mode = "");
     int IsACK(const String ID = "", const String From = "", const String Mode = "");
     void RemoveACK(int Location = -1);
+    void ResetRoute();
+    void ResetFriend();
+    void ResetACK();
+    void Terminate();
 };

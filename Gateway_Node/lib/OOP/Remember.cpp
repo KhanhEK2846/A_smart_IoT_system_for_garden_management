@@ -41,7 +41,7 @@ Remember::Remember()
 
 Remember::~Remember(){}
 
-bool Remember::AddAddress(const String ID, const String From)
+bool Remember::AddRoute(const String ID, const String From)
 {
     if(ID == "" || From == "")
         return false;
@@ -62,7 +62,7 @@ bool Remember::AddAddress(const String ID, const String From)
     return true;
 }
 
-void Remember::RemoveAddress(const String ID){
+void Remember::RemoveRoute(const String ID){
     if(ID == "")
         return;
     bool del = false;
@@ -85,7 +85,41 @@ void Remember::RemoveAddress(const String ID){
     }
 }
 
-const String Remember::GetAddress(const String ID)
+void Remember::RemoveRouteViaFrom(const String From){
+    if(From == "")
+        return;
+    while(true){
+        int loca = IsFromOfRoute(From);
+        if(loca == -1) return;
+        for(flag = loca;flag<10;flag++){
+            if(data[flag].ID == "" && data[flag].NodeAdrress == "")
+                break;
+            if(flag == 9)//End of Memory
+            {
+                data[flag].ID = "";
+                data[flag].NodeAdrress = "";
+            }else{
+                data[flag].ID = data[flag+1].ID;
+                data[flag].NodeAdrress = data[flag+1].NodeAdrress;    
+            }
+        }
+    }
+}
+
+int Remember::IsFromOfRoute(const String From){
+    if(From == "")
+        return -1;
+    for(flag = 0; flag <10; flag++){
+        if(data[flag].NodeAdrress == From)
+            return flag;
+        if(data[flag].NodeAdrress == "")
+            break;
+    }
+    return -1;
+
+}
+
+const String Remember::GetRoute(const String ID)
 {
     if(ID == "")
         return "";
@@ -104,10 +138,13 @@ const String Remember::GetAddress(const String ID)
 bool Remember::AddFriend(const String ID,const int channel){
     if(ID == "" || channel == -1 || channel > 31)
         return false;
-    if(IsOnAddress(ID)) // Not save if already on routing table
+    String tmpID = "";
+    if(ID.length() == 6) tmpID = ID;
+    else tmpID = CalculateToEncode(ID);
+    if(IsOnRoute(tmpID)) // Not save if already on routing table
         return false;
     if(friends[channel].friendID == ""){
-        friends[channel].friendID = ID;
+        friends[channel].friendID = tmpID;
         return true;
     }
     return false;
@@ -149,7 +186,7 @@ const bool Remember::IsFriend(const uint8_t H,const uint8_t L,const uint8_t chan
     uint8_t tmp_H = 0;
     uint8_t tmp_L = 0;
     uint8_t tmp_chan = 0;
-    CalculateAddressChannel(friends[chan].friendID,tmp_H,tmp_L,tmp_chan);
+    DeCodeAddressChannel(friends[chan].friendID,tmp_H,tmp_L,tmp_chan);
     if(tmp_H==H && tmp_L==L && tmp_chan==chan)
         return true;
     return false;
@@ -158,21 +195,21 @@ const bool Remember::IsFriend(const uint8_t H,const uint8_t L,const uint8_t chan
 const bool Remember::IsFriend(const String ID){
     if(ID== "")
         return false;
-    if(friends[CalculateChannel(ID)].friendID == ID)
+    if(friends[CalculateChannel(ID)].friendID == CalculateToEncode(ID))
         return true;
     return false;
 }
 
-const bool Remember::IsOnAddress(const String friendID){
+const bool Remember::IsOnRoute(const String friendID){
     if(friendID == "")
         return false;
 
     for(flag = 0;flag <10; flag++)
     {
-        if(data[flag].ID == friendID)
-            return true;
         if(data[flag].ID == "")
             break;
+        if(friendID == CalculateToEncode(data[flag].ID))
+            return true;
     }
     
     return false;
@@ -229,4 +266,33 @@ void Remember::RemoveACK(int Location){
         }
 
     }
+}
+
+void Remember::ResetRoute(){
+    for(flag = 0; flag<10;flag++){
+        if(data[flag].ID == "" || data[flag].NodeAdrress == "")
+            return;
+        data[flag].ID = "";
+        data[flag].NodeAdrress= "";
+    }
+}
+void Remember::ResetFriend(){
+    for(flag = 0;flag<32;flag++){
+        friends[flag].friendID = "";
+    }
+}
+void Remember::ResetACK(){
+    for(flag = 0; flag<20;flag++){
+        if(ACK[flag].ID == "" || ACK[flag].From == "" || ACK[flag].Mode == "")
+            return;
+        ACK[flag].ID = "";
+        ACK[flag].From= "";
+        ACK[flag].Mode = "";
+    }
+}
+
+void Remember::Terminate(){
+    ResetACK();
+    ResetFriend();
+    ResetRoute();
 }
