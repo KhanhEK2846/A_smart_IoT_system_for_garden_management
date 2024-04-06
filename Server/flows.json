@@ -551,7 +551,7 @@
         "type": "ui_group",
         "name": "GmailChange",
         "tab": "45166d28cb8c42fd",
-        "order": 3,
+        "order": 4,
         "disp": false,
         "width": "24",
         "collapse": false,
@@ -608,7 +608,18 @@
         "height": 1
     },
     {
-        "id": "be1214dade1f2fcd",
+        "id": "3df901b014d88607",
+        "type": "ui_group",
+        "name": "Phone",
+        "tab": "45166d28cb8c42fd",
+        "order": 3,
+        "disp": false,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cc4fdf349a04476e",
         "type": "ui_spacer",
         "z": "7883bef42eddac18",
         "name": "spacer",
@@ -618,7 +629,17 @@
         "height": 1
     },
     {
-        "id": "28591fe69e0bae58",
+        "id": "6dbb91aa1beef3b1",
+        "type": "ui_spacer",
+        "z": "7883bef42eddac18",
+        "name": "spacer",
+        "group": "3df901b014d88607",
+        "order": 2,
+        "width": 22,
+        "height": 1
+    },
+    {
+        "id": "fc7880e55cfa50c4",
         "type": "ui_spacer",
         "z": "7883bef42eddac18",
         "name": "spacer",
@@ -3498,7 +3519,7 @@
         "topicType": "msg",
         "splitLayout": "",
         "className": "",
-        "x": 90,
+        "x": 110,
         "y": 220,
         "wires": [
             [
@@ -3518,7 +3539,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 340,
+        "x": 360,
         "y": 220,
         "wires": [
             [
@@ -3542,7 +3563,7 @@
         "className": "",
         "topic": "",
         "name": "",
-        "x": 580,
+        "x": 600,
         "y": 460,
         "wires": []
     },
@@ -3627,7 +3648,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "{\"group\":{\"hide\":[\"Setting_ConfigureUser\",\"Setting_GmailChange\"],\"show\":[\"Setting_Setting\"]}}",
+                "to": "{\"group\":{\"hide\":[\"Setting_ConfigureUser\",\"Setting_GmailChange\",\"Setting_Phone\"],\"show\":[\"Setting_Setting\"]}}",
                 "tot": "json"
             }
         ],
@@ -3650,7 +3671,7 @@
         "z": "7883bef42eddac18",
         "name": "",
         "group": "645689cb032a4e45",
-        "order": 4,
+        "order": 5,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -3729,7 +3750,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "{\"group\":{\"hide\":[\"Setting_ConfigureUser\",\"Setting_GmailChange\"],\"show\":[\"Setting_Setting\"]}}",
+                "to": "{\"group\":{\"hide\":[\"Setting_ConfigureUser\",\"Setting_GmailChange\",\"Setting_Phone\"],\"show\":[\"Setting_Setting\"]}}",
                 "tot": "json"
             }
         ],
@@ -3752,7 +3773,7 @@
         "z": "7883bef42eddac18",
         "name": "Change User & Password",
         "group": "645689cb032a4e45",
-        "order": 3,
+        "order": 4,
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -3784,7 +3805,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "{\"group\":{\"show\":[\"Setting_ConfigureUser\"],\"hide\":[\"Setting_Setting\",\"Setting_GmailChange\"]}}",
+                "to": "{\"group\":{\"show\":[\"Setting_ConfigureUser\"],\"hide\":[\"Setting_Setting\",\"Setting_GmailChange\",\"Setting_Phone\"]}}",
                 "tot": "json"
             }
         ],
@@ -3867,7 +3888,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 340,
+        "x": 360,
         "y": 740,
         "wires": [
             [
@@ -3905,7 +3926,7 @@
         "topicType": "msg",
         "splitLayout": "",
         "className": "",
-        "x": 140,
+        "x": 160,
         "y": 740,
         "wires": [
             [
@@ -3992,7 +4013,7 @@
         "y": 460,
         "wires": [
             [
-                "33e0e4139010dc5c"
+                "1b98c36794bbf287"
             ]
         ]
     },
@@ -4074,7 +4095,7 @@
         "id": "93762de513da450c",
         "type": "ui_button",
         "z": "7883bef42eddac18",
-        "name": "",
+        "name": "Reset Gmail",
         "group": "e6c1acfed343481e",
         "order": 4,
         "width": 2,
@@ -4090,8 +4111,8 @@
         "payloadType": "str",
         "topic": "Reset",
         "topicType": "str",
-        "x": 50,
-        "y": 460,
+        "x": 110,
+        "y": 540,
         "wires": [
             [
                 "2cd67180572b7ffd"
@@ -4110,8 +4131,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 250,
-        "y": 460,
+        "x": 290,
+        "y": 540,
         "wires": [
             [
                 "6df3bd7557d686d7",
@@ -4128,7 +4149,7 @@
         "links": [
             "2d65db03d877412e"
         ],
-        "x": 355,
+        "x": 435,
         "y": 540,
         "wires": []
     },
@@ -4145,6 +4166,275 @@
         "wires": [
             [
                 "6fda75b706412420"
+            ]
+        ]
+    },
+    {
+        "id": "7b2b68a60bb57afe",
+        "type": "ui_form",
+        "z": "7883bef42eddac18",
+        "name": "PhoneChange",
+        "label": "Phone  via WhatsApp",
+        "group": "3df901b014d88607",
+        "order": 5,
+        "width": 24,
+        "height": 1,
+        "options": [
+            {
+                "label": "Phone Number",
+                "value": "Phone",
+                "type": "number",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "API",
+                "value": "Api",
+                "type": "text",
+                "required": true,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "Phone": "",
+            "Api": ""
+        },
+        "payload": "",
+        "submit": "submit",
+        "cancel": "cancel",
+        "topic": "topic",
+        "topicType": "msg",
+        "splitLayout": "",
+        "className": "",
+        "x": 120,
+        "y": 860,
+        "wires": [
+            [
+                "fdc1c3fe0c3f6fe3"
+            ]
+        ]
+    },
+    {
+        "id": "fdc1c3fe0c3f6fe3",
+        "type": "function",
+        "z": "7883bef42eddac18",
+        "name": "SetPhone",
+        "func": "var api = global.get(\"api\") || \"\"\nvar phone = global.get(\"phone\") || \"\"\n\nif ((api == \"\" || api != msg.payload.Api) && (phone == \"\" || phone != msg.payload.Phone) ) {\n    global.set(\"api\", msg.payload.Api)\n    global.set(\"phone\", msg.payload.Phone)\n    msg.payload = \"Change successfully\"\n} else {\n    msg.payload = \"No change\"\n}\n\nreturn msg\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 860,
+        "wires": [
+            [
+                "8f2ba7bc71066103",
+                "6df3bd7557d686d7"
+            ]
+        ]
+    },
+    {
+        "id": "1b98c36794bbf287",
+        "type": "ui_button",
+        "z": "7883bef42eddac18",
+        "name": "Back",
+        "group": "3df901b014d88607",
+        "order": 1,
+        "width": 2,
+        "height": 1,
+        "passthru": true,
+        "label": "",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "fa-cog",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1430,
+        "y": 460,
+        "wires": [
+            [
+                "33e0e4139010dc5c"
+            ]
+        ]
+    },
+    {
+        "id": "0db91ccf8b50d0b7",
+        "type": "change",
+        "z": "7883bef42eddac18",
+        "name": "Change",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"group\":{\"show\":[\"Setting_Phone\"],\"hide\":[\"Setting_Setting\"]}}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1760,
+        "y": 820,
+        "wires": [
+            [
+                "7efc81c708b31a07"
+            ]
+        ]
+    },
+    {
+        "id": "8e98e3ca10452132",
+        "type": "ui_button",
+        "z": "7883bef42eddac18",
+        "name": "Phone",
+        "group": "645689cb032a4e45",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Phone",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "fa-whatsapp",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "Change",
+        "topicType": "str",
+        "x": 1070,
+        "y": 820,
+        "wires": [
+            [
+                "0db91ccf8b50d0b7",
+                "79a95508963b65f4"
+            ]
+        ]
+    },
+    {
+        "id": "1608247743a21848",
+        "type": "ui_button",
+        "z": "7883bef42eddac18",
+        "name": "Reset Phone",
+        "group": "3df901b014d88607",
+        "order": 4,
+        "width": 2,
+        "height": 1,
+        "passthru": false,
+        "label": "",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "fa-trash",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "Reset",
+        "topicType": "str",
+        "x": 110,
+        "y": 400,
+        "wires": [
+            [
+                "14e5fbbe7a12e26c"
+            ]
+        ]
+    },
+    {
+        "id": "14e5fbbe7a12e26c",
+        "type": "function",
+        "z": "7883bef42eddac18",
+        "name": "ResetPhone",
+        "func": "var api = global.get(\"api\") || \"\"\nvar phone = global.get(\"phone\") || \"\"\n\nif (msg.topic == \"Reset\") {\n    if (api == \"\" && phone == \"\") {\n        msg.payload = \"Nothing to Reset\"\n    } else {\n        global.set(\"api\", \"\")\n        global.set(\"phone\", \"\")\n        msg.payload = \"Reset Gmail successfully\"\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 400,
+        "wires": [
+            [
+                "6df3bd7557d686d7",
+                "51102038c4bd9b0b"
+            ]
+        ]
+    },
+    {
+        "id": "79a95508963b65f4",
+        "type": "function",
+        "z": "7883bef42eddac18",
+        "name": "GetPhone",
+        "func": "var api = global.get(\"api\") || \"\"\nvar phone = global.get(\"phone\") || \"\"\n\nif (msg.topic == \"Change\"){\n    if( api == \"\" || phone == \"\"){\n        msg.payload = \"No Set Up\"\n    }else{\n        msg.payload = \"Phone Number: \" + phone + \"               API: \"+api\n    }\n}\nif (msg.topic == \"Reset\"){\n    msg.payload = \"No Set Up\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1360,
+        "y": 880,
+        "wires": [
+            [
+                "2a6208285e5a76d2"
+            ]
+        ]
+    },
+    {
+        "id": "2a6208285e5a76d2",
+        "type": "ui_text",
+        "z": "7883bef42eddac18",
+        "group": "3df901b014d88607",
+        "order": 3,
+        "width": 22,
+        "height": 1,
+        "name": "Name",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1630,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "51102038c4bd9b0b",
+        "type": "link out",
+        "z": "7883bef42eddac18",
+        "name": "TextPhone",
+        "mode": "link",
+        "links": [
+            "846527bf1f7844d8"
+        ],
+        "x": 435,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "846527bf1f7844d8",
+        "type": "link in",
+        "z": "7883bef42eddac18",
+        "name": "TextPhone",
+        "links": [
+            "51102038c4bd9b0b"
+        ],
+        "x": 1125,
+        "y": 880,
+        "wires": [
+            [
+                "79a95508963b65f4"
             ]
         ]
     },
@@ -4316,7 +4606,8 @@
         "y": 660,
         "wires": [
             [
-                "2af11f27a9fc72c8"
+                "2af11f27a9fc72c8",
+                "e9e9c4a246d21964"
             ]
         ]
     },
@@ -4324,7 +4615,7 @@
         "id": "2af11f27a9fc72c8",
         "type": "function",
         "z": "071ee232d3ea60d6",
-        "name": "PreSend (To Do) ",
+        "name": "PreSend (Gmail) ",
         "func": "var mail = global.get(\"mail\") || \"\"\nvar ErrorRecord = flow.get(\"ErrorRecord\") || [];\n\nif(mail != \"\"){\n    msg.to = mail\n    var message = \"\"\n    if (msg.payload == \"SendAllError\"){\n        msg.topic = \"Error Sensor List\"\n        var mess = \"\"\n        for (let i = 0; i < ErrorRecord.length; i++) {\n            var tmpData = ErrorRecord[i].data\n            if (tmpData.error_dht == \"1\" || tmpData.error_light == \"1\" || tmpData.error_soil == \"1\") {\n                mess += \"ID: \" + String(ErrorRecord[i].id) + \" \\n\"\n                if(tmpData.error_dht == \"1\" )\n                    mess += \"- DHT Sensor: Error\\n\"\n                if(tmpData.error_light == \"1\" )\n                    mess += \"- Light Sensor: Error\\n\"\n                if(tmpData.error_soil == \"1\" )\n                    mess += \"- Soil Moisture Sensor: Error\\n\"\n            }\n        }\n        msg.payload = mess\n    }\n\n    return msg\n    \n}",
         "outputs": 1,
         "timeout": 0,
@@ -4338,6 +4629,46 @@
             [
                 "d030a89ea742a909"
             ]
+        ]
+    },
+    {
+        "id": "e9e9c4a246d21964",
+        "type": "function",
+        "z": "071ee232d3ea60d6",
+        "name": "PreSend (WhatsApp) ",
+        "func": "var api = global.get('api') || \"\"\nvar phone = global.get('phone') ||\"\"\nvar ErrorRecord = flow.get(\"ErrorRecord\") || [];\n\nif(api != \"\" && phone != \"\"){\n    msg.api = api\n    msg.phone = phone\n    var message = \"\"\n    if (msg.payload == \"SendAllError\"){\n        msg.topic = \"Error Sensor List\"\n        var mess = \"\"\n        for (let i = 0; i < ErrorRecord.length; i++) {\n            var tmpData = ErrorRecord[i].data\n            if (tmpData.error_dht == \"1\" || tmpData.error_light == \"1\" || tmpData.error_soil == \"1\") {\n                mess += \"ID: \" + String(ErrorRecord[i].id) + \" \\n\"\n                if(tmpData.error_dht == \"1\" )\n                    mess += \"- DHT Sensor: Error\\n\"\n                if(tmpData.error_light == \"1\" )\n                    mess += \"- Light Sensor: Error\\n\"\n                if(tmpData.error_soil == \"1\" )\n                    mess += \"- Soil Moisture Sensor: Error\\n\"\n            }\n        }\n        msg.text = mess\n    }\n\n    return msg\n    \n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 440,
+        "wires": [
+            [
+                "9de6e6cf6709b6c9"
+            ]
+        ]
+    },
+    {
+        "id": "9de6e6cf6709b6c9",
+        "type": "node-red-contrib-whatsapp-cmb-send-message",
+        "z": "071ee232d3ea60d6",
+        "name": "",
+        "credtype": "vars",
+        "account": "",
+        "text": "text",
+        "phonenumbervalue": "phone",
+        "apikeyvalue": "api",
+        "apikeyinputtypemessage": "msg",
+        "phonenumberinputtypemessage": "msg",
+        "inputtypemessage": "msg",
+        "rejectssl": false,
+        "x": 940,
+        "y": 440,
+        "wires": [
+            []
         ]
     },
     {
