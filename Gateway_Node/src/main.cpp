@@ -108,7 +108,7 @@ QueueHandle_t Queue_Delivery = NULL;
 QueueHandle_t Queue_Command = NULL;
 QueueHandle_t Queue_Database = NULL;
 QueueHandle_t Queue_ReSend = NULL;
-const int Queue_Length = 10;
+const int Queue_Length = 50;
 const unsigned long long Queue_item_delivery_size = sizeof(DataPackage);
 const unsigned long long Queue_item_command_size = sizeof(String);
 const unsigned long long Queue_item_database_size = sizeof(DataPackage);
@@ -222,7 +222,7 @@ void Delivery(void * pvParameters)
     /*----------------------Memorize---------------------------*/
     if(data.GetMode() == Memorize) //BUG: There is a realtime bug in here
     {
-      if(data.GetMode() == CommandDirect || data.GetMode() == CommandNotDirect){ //Save in Friend
+      if(data.GetData() == CommandDirect || data.GetData() == CommandNotDirect){ //Save in Friend
         Serial.println("Saving to Friend");
         Locate.RemoveRouteViaFrom(data.GetFrom());
         if(Locate.AddFriend(data.GetFrom(),CalculateChannel(data.GetFrom()))){
@@ -428,7 +428,7 @@ void Capture(void * pvParameters)
         xQueueSendToFront(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
       }
       /*-------------------------------Save for Routing Table---------------------------------*/
-      Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),"","");
+      Memory_Pack.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),Receive_Pack.GetMode(),"");
       xQueueSendToFront(Queue_Delivery,&Memory_Pack,pdMS_TO_TICKS(10));
       /*------------------------Itself or other-----------------*/  
       if(Receive_Pack.GetID() == ID) //If message for node 
@@ -1092,7 +1092,7 @@ void Hello_Around()
     Wait_to_Hello = millis();
     return;
   }
-  if( Friend_Channel != -1 && ((unsigned long)(millis()-Wait_to_Hello)> Five_Seconds_millis))
+  if( Friend_Channel != -1 && ((unsigned long)(millis()-Wait_to_Hello)> Five_minutes_millis))
   {
     if(Friend_Channel >= 0 && Friend_Channel <= 31){
       if(gateway_node == GATEWAY_STATUS)
