@@ -442,6 +442,64 @@
         "h": 122
     },
     {
+        "id": "d459a046ce05521b",
+        "type": "group",
+        "z": "7883bef42eddac18",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "05b2be7fce90053f",
+            "87ae274016b0defb",
+            "225938e5e85e31f0",
+            "80e518d238df0579",
+            "fa960b1330c37a74",
+            "6fda75b706412420",
+            "2d65db03d877412e",
+            "0db91ccf8b50d0b7",
+            "8e98e3ca10452132",
+            "79a95508963b65f4",
+            "2a6208285e5a76d2",
+            "846527bf1f7844d8",
+            "c2ef1651a428cdee"
+        ],
+        "x": 954,
+        "y": 559,
+        "w": 892,
+        "h": 362
+    },
+    {
+        "id": "8a266268f9b6708a",
+        "type": "group",
+        "z": "071ee232d3ea60d6",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "d030a89ea742a909",
+            "9de6e6cf6709b6c9",
+            "bfb08cd615569592",
+            "1e3971cf1fc47e5c",
+            "d478e3188deb1697"
+        ],
+        "x": 1274,
+        "y": 399,
+        "w": 472,
+        "h": 302
+    },
+    {
         "id": "f532af6f73a050bd",
         "type": "ui_base",
         "theme": {
@@ -3952,6 +4010,7 @@
         "id": "05b2be7fce90053f",
         "type": "ui_button",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "Change User & Password",
         "group": "645689cb032a4e45",
         "order": 4,
@@ -3968,8 +4027,8 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 1470,
-        "y": 500,
+        "x": 1450,
+        "y": 600,
         "wires": [
             [
                 "87ae274016b0defb"
@@ -3980,6 +4039,7 @@
         "id": "87ae274016b0defb",
         "type": "change",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "Change",
         "rules": [
             {
@@ -3995,8 +4055,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1760,
-        "y": 500,
+        "x": 1740,
+        "y": 600,
         "wires": [
             [
                 "7efc81c708b31a07"
@@ -4032,6 +4092,7 @@
         "id": "225938e5e85e31f0",
         "type": "ui_button",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "",
         "group": "645689cb032a4e45",
         "order": 2,
@@ -4049,7 +4110,7 @@
         "topic": "Change",
         "topicType": "str",
         "x": 1050,
-        "y": 560,
+        "y": 680,
         "wires": [
             [
                 "80e518d238df0579",
@@ -4121,6 +4182,7 @@
         "id": "80e518d238df0579",
         "type": "change",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "Change",
         "rules": [
             {
@@ -4137,7 +4199,7 @@
         "to": "",
         "reg": false,
         "x": 1760,
-        "y": 560,
+        "y": 680,
         "wires": [
             [
                 "7efc81c708b31a07"
@@ -4204,6 +4266,7 @@
         "id": "fa960b1330c37a74",
         "type": "ui_text",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "group": "e6c1acfed343481e",
         "order": 3,
         "width": 22,
@@ -4218,13 +4281,14 @@
         "fontSize": 16,
         "color": "#000000",
         "x": 1630,
-        "y": 740,
+        "y": 780,
         "wires": []
     },
     {
         "id": "6fda75b706412420",
         "type": "function",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "GetGmail",
         "func": "var mail = global.get(\"mail\") || \"\"\nif (msg.topic == \"Change\"){\n    if( mail == \"\"){\n        msg.payload = \"Not Yet\"\n    }else{\n        msg.payload = mail\n    }\n}\nif (msg.topic == \"Reset\"){\n    msg.payload = \"Not Yet\"\n}\nreturn msg;",
         "outputs": 1,
@@ -4234,7 +4298,7 @@
         "finalize": "",
         "libs": [],
         "x": 1360,
-        "y": 740,
+        "y": 780,
         "wires": [
             [
                 "fa960b1330c37a74"
@@ -4344,12 +4408,13 @@
         "id": "2d65db03d877412e",
         "type": "link in",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "TextGmail",
         "links": [
             "024ab3dc8bfda136"
         ],
-        "x": 1125,
-        "y": 740,
+        "x": 1135,
+        "y": 780,
         "wires": [
             [
                 "6fda75b706412420"
@@ -4456,6 +4521,7 @@
         "id": "0db91ccf8b50d0b7",
         "type": "change",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "Change",
         "rules": [
             {
@@ -4483,6 +4549,7 @@
         "id": "8e98e3ca10452132",
         "type": "ui_button",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "Phone",
         "group": "645689cb032a4e45",
         "order": 3,
@@ -4563,6 +4630,7 @@
         "id": "79a95508963b65f4",
         "type": "function",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "GetPhone",
         "func": "var api = global.get(\"api\") || \"\"\nvar phone = global.get(\"phone\") || \"\"\n\nif (msg.topic == \"Change\"){\n    if( api == \"\" || phone == \"\"){\n        msg.payload = \"No Set Up\"\n    }else{\n        msg.payload = \"Phone Number: \" + phone + \"               API: \"+api\n    }\n}\nif (msg.topic == \"Reset\"){\n    msg.payload = \"No Set Up\"\n}\nreturn msg;",
         "outputs": 1,
@@ -4583,6 +4651,7 @@
         "id": "2a6208285e5a76d2",
         "type": "ui_text",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "group": "3df901b014d88607",
         "order": 3,
         "width": 22,
@@ -4618,6 +4687,7 @@
         "id": "846527bf1f7844d8",
         "type": "link in",
         "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
         "name": "TextPhone",
         "links": [
             "51102038c4bd9b0b"
@@ -4889,6 +4959,17 @@
         "wires": []
     },
     {
+        "id": "c2ef1651a428cdee",
+        "type": "comment",
+        "z": "7883bef42eddac18",
+        "g": "d459a046ce05521b",
+        "name": "Feature Setting",
+        "info": "",
+        "x": 1060,
+        "y": 600,
+        "wires": []
+    },
+    {
         "id": "99e13b1dc7ecaa22",
         "type": "firebase-get",
         "z": "9f5704f675d02eb6",
@@ -5011,6 +5092,7 @@
         "id": "d030a89ea742a909",
         "type": "e-mail",
         "z": "071ee232d3ea60d6",
+        "g": "8a266268f9b6708a",
         "server": "smtp.gmail.com",
         "port": "465",
         "authtype": "BASIC",
@@ -5020,7 +5102,7 @@
         "tls": true,
         "name": "",
         "dname": "Notification",
-        "x": 950,
+        "x": 1610,
         "y": 660,
         "wires": []
     },
@@ -5057,8 +5139,7 @@
         "y": 660,
         "wires": [
             [
-                "2af11f27a9fc72c8",
-                "e9e9c4a246d21964"
+                "2af11f27a9fc72c8"
             ]
         ]
     },
@@ -5066,39 +5147,20 @@
         "id": "2af11f27a9fc72c8",
         "type": "function",
         "z": "071ee232d3ea60d6",
-        "name": "PreSend (Gmail) ",
-        "func": "var mail = global.get(\"mail\") || \"\"\nvar ErrorRecord = flow.get(\"ErrorRecord\") || [];\n\nif(mail != \"\"){\n    msg.to = mail\n    var message = \"\"\n    if (msg.payload == \"SendAllError\"){\n        msg.topic = \"Error Sensor List\"\n        var mess = \"\"\n        for (let i = 0; i < ErrorRecord.length; i++) {\n            var tmpData = ErrorRecord[i].data\n            if (tmpData.error_dht == \"1\" || tmpData.error_light == \"1\" || tmpData.error_soil == \"1\") {\n                mess += \"ID: \" + String(ErrorRecord[i].id) + \" \\n\"\n                if(tmpData.error_dht == \"1\" )\n                    mess += \"- DHT Sensor: Error\\n\"\n                if(tmpData.error_light == \"1\" )\n                    mess += \"- Light Sensor: Error\\n\"\n                if(tmpData.error_soil == \"1\" )\n                    mess += \"- Soil Moisture Sensor: Error\\n\"\n            }\n        }\n        msg.payload = mess\n    }\n\n    return msg\n    \n}",
+        "name": "Check Error Sensor",
+        "func": "var ErrorRecord = flow.get(\"ErrorRecord\") || [];\n\nvar message = \"\"\nif (msg.payload == \"SendAllError\"){\n    msg.topic = \"Error Sensor List\"\n    var mess = \"\"\n    for (let i = 0; i < ErrorRecord.length; i++) {\n        var tmpData = ErrorRecord[i].data\n        if (tmpData.error_dht == \"1\" || tmpData.error_light == \"1\" || tmpData.error_soil == \"1\") {\n            mess += \"ID: \" + String(ErrorRecord[i].id) + \" \\n\"\n            if(tmpData.error_dht == \"1\" )\n                mess += \"- DHT Sensor: Error\\n\"\n            if(tmpData.error_light == \"1\" )\n                mess += \"- Light Sensor: Error\\n\"\n            if(tmpData.error_soil == \"1\" )\n                mess += \"- Soil Moisture Sensor: Error\\n\"\n        }\n    }\n    msg.payload = mess\n}\n\nreturn msg",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 670,
-        "y": 660,
-        "wires": [
-            [
-                "d030a89ea742a909"
-            ]
-        ]
-    },
-    {
-        "id": "e9e9c4a246d21964",
-        "type": "function",
-        "z": "071ee232d3ea60d6",
-        "name": "PreSend (WhatsApp) ",
-        "func": "var api = global.get('api') || \"\"\nvar phone = global.get('phone') ||\"\"\nvar ErrorRecord = flow.get(\"ErrorRecord\") || [];\n\nif(api != \"\" && phone != \"\"){\n    msg.api = api\n    msg.phone = phone\n    var message = \"\"\n    if (msg.payload == \"SendAllError\"){\n        msg.topic = \"Error Sensor List\"\n        var mess = \"\"\n        for (let i = 0; i < ErrorRecord.length; i++) {\n            var tmpData = ErrorRecord[i].data\n            if (tmpData.error_dht == \"1\" || tmpData.error_light == \"1\" || tmpData.error_soil == \"1\") {\n                mess += \"ID: \" + String(ErrorRecord[i].id) + \" \\n\"\n                if(tmpData.error_dht == \"1\" )\n                    mess += \"- DHT Sensor: Error\\n\"\n                if(tmpData.error_light == \"1\" )\n                    mess += \"- Light Sensor: Error\\n\"\n                if(tmpData.error_soil == \"1\" )\n                    mess += \"- Soil Moisture Sensor: Error\\n\"\n            }\n        }\n        msg.text = mess\n    }\n\n    return msg\n    \n}",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 660,
+        "x": 710,
         "y": 440,
         "wires": [
             [
-                "9de6e6cf6709b6c9"
+                "bfb08cd615569592",
+                "1e3971cf1fc47e5c"
             ]
         ]
     },
@@ -5106,6 +5168,7 @@
         "id": "9de6e6cf6709b6c9",
         "type": "node-red-contrib-whatsapp-cmb-send-message",
         "z": "071ee232d3ea60d6",
+        "g": "8a266268f9b6708a",
         "name": "",
         "credtype": "vars",
         "account": "",
@@ -5116,7 +5179,7 @@
         "phonenumberinputtypemessage": "msg",
         "inputtypemessage": "msg",
         "rejectssl": false,
-        "x": 940,
+        "x": 1640,
         "y": 440,
         "wires": [
             []
@@ -5127,7 +5190,7 @@
         "type": "function",
         "z": "071ee232d3ea60d6",
         "name": "Storage OutOf",
-        "func": "var OutOfRecord = flow.get(\"OutOfRecord\") || [];\nvar json = {\n    \"light\": msg.payload.Status.Led,\n    \"pump\": msg.payload.Status.Pump,\n}\nvar date = new Date();\n\n// Find ID if it has\nvar flag = -1;\nfor (let i = 0; i < OutOfRecord.length; i++) {\n    if (OutOfRecord[i].id == msg.topic) {\n        flag = i;\n        break;\n    }\n}\n\nif (flag == -1) // Save new ID\n{\n    OutOfRecord.unshift({\n        \"id\": msg.topic,\n        \"data\": json\n    });\n    flow.set(\"OutOfRecord\", OutOfRecord);\n    \n} else { //Check Error\n    //Save change data\n    OutOfRecord[flag] = {\n        \"id\": msg.topic,\n        \"data\": json\n    };\n    flow.set(\"OutOfRecord\", OutOfRecord);\n}\n\nreturn msg;",
+        "func": "var OutOfRecord = flow.get(\"OutOfRecord\") || [];\nvar json = {\n    \"light\": msg.payload.Status.Led,\n    \"light_value\": msg.payload.Sensor.Light,\n    \"light_past\": msg.payload.Sensor.Light,\n    \"light_time\": 0,\n    \"light_warn\": false,\n    \"pump\": msg.payload.Status.Pump,\n    \"pump_value\": msg.payload.Sensor.Solid,\n    \"pump_past\": msg.payload.Sensor.Solid,\n    \"pump_time\": 0,\n    \"pump_warn\": false\n}\n\n// Find ID if it has\nvar flag = -1;\nfor (let i = 0; i < OutOfRecord.length; i++) {\n    if (OutOfRecord[i].id == msg.topic) {\n        flag = i;\n        break;\n    }\n}\n\nif (flag == -1) // Save new ID\n{\n    OutOfRecord.unshift({\n        \"id\": msg.topic,\n        \"data\": json\n    });\n    \n} else { //Check Error\n    //Save change data\n    \n    OutOfRecord[flag].data.light = json.light\n    OutOfRecord[flag].data.pump = json.pump\n    OutOfRecord[flag].data.light_value = json.light_value\n    OutOfRecord[flag].data.pump_value = json.pump_value\n    \n}\nflow.set(\"OutOfRecord\", OutOfRecord);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -5137,7 +5200,9 @@
         "x": 400,
         "y": 740,
         "wires": [
-            []
+            [
+                "976cb9cd6a458206"
+            ]
         ]
     },
     {
@@ -5145,18 +5210,99 @@
         "type": "function",
         "z": "071ee232d3ea60d6",
         "name": "Check OutOf",
-        "func": "var OutOfRecord = flow.get(\"OutOfRecord\") || [];\n\nreturn msg;",
+        "func": "var OutOfRecord = flow.get(\"OutOfRecord\") || [];\nvar mess = \"\";\nfor (let i = 0; i < OutOfRecord.length; i++) {\n    var Change = false;\n    var date = new Date()\n    var data = OutOfRecord[i].data;\n    if(data.light == \"0\"){ //OFF\n        data.light_time = 0\n        data.light_warn = false   \n        data.light_past = data.light_value\n    }\n    if (data.pump == \"0\"){ //OFF\n        data.pump_time = 0\n        data.pump_warn = false\n        data.pump_past = data.pump_value\n    }\n    if(data.pump == \"1\" && !data.pump_warn){\n        if(data.pump_time == 0)\n            data.pump_time = date.getTime()//Milisecond\n        else if ((Number(data.pump_value) <= Number(data.pump_past) + 10 ) &&  (date.getTime() - data.pump_time >= 60000) ){\n            data.pump_warn = true;\n            Change = true;\n        }\n    }\n    if (data.light == \"1\" && !data.light_warn) {\n        if (data.light_time == 0)\n            data.light_time = date.getTime()//Milisecond\n        else if ((Number(data.light_value) <= Number(data.light_past) + 10) && (date.getTime() - data.light_time >= 60000)) {\n            data.light_warn = true;\n            Change = true;\n        }\n    }\n    if (Change){\n        mess += \"ID: \" + String(OutOfRecord[i].id) + \" \\n\"\n        if (data.pump_warn)\n            mess += \"Out Of Water \\n\"\n        if(data.light_warn)\n            mess += \"Broken Light \\n\"\n    }\n}\n\nflow.set(\"OutOfRecord\", OutOfRecord);\n\nif(mess != \"\"){\n    msg.payload = mess;\n    return msg;\n}\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
-        "y": 920,
+        "x": 730,
+        "y": 660,
         "wires": [
-            []
+            [
+                "bfb08cd615569592",
+                "1e3971cf1fc47e5c"
+            ]
         ]
+    },
+    {
+        "id": "976cb9cd6a458206",
+        "type": "trigger",
+        "z": "071ee232d3ea60d6",
+        "name": "Loop Check Error",
+        "op1": "1",
+        "op2": "0",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "-5",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 690,
+        "y": 860,
+        "wires": [
+            [
+                "a533d84ac893867f"
+            ]
+        ]
+    },
+    {
+        "id": "bfb08cd615569592",
+        "type": "function",
+        "z": "071ee232d3ea60d6",
+        "g": "8a266268f9b6708a",
+        "name": "Gateway Gmail",
+        "func": "var mail = global.get(\"mail\") || \"\"\n\nif (mail != \"\"){\n    msg.to = mail\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1420,
+        "y": 660,
+        "wires": [
+            [
+                "d030a89ea742a909"
+            ]
+        ]
+    },
+    {
+        "id": "1e3971cf1fc47e5c",
+        "type": "function",
+        "z": "071ee232d3ea60d6",
+        "g": "8a266268f9b6708a",
+        "name": "Gateway WhatsApp",
+        "func": "var api = global.get('api') || \"\"\nvar phone = global.get('phone') || \"\"\n\nif (api != \"\" && phone != \"\") {\n    msg.api = api\n    msg.phone = phone\n    msg.text = msg.payload\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1400,
+        "y": 440,
+        "wires": [
+            [
+                "9de6e6cf6709b6c9"
+            ]
+        ]
+    },
+    {
+        "id": "d478e3188deb1697",
+        "type": "comment",
+        "z": "071ee232d3ea60d6",
+        "g": "8a266268f9b6708a",
+        "name": "Gateway Notification",
+        "info": "",
+        "x": 1490,
+        "y": 560,
+        "wires": []
     },
     {
         "id": "86530270e03db138",
