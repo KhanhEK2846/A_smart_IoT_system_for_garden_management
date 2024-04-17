@@ -56,6 +56,7 @@ String Own_address = "";
 volatile uint8_t Gateway_AddH = 0;
 volatile uint8_t Gateway_AddL = 0;
 volatile uint8_t Gateway_Channel = 0x17;
+volatile boolean Gateway_Changed_byUser = false;
 volatile int Friend_Channel = 0;
 unsigned long Wait_to_Hello = 0;
 DataPackage Hello_Message;
@@ -212,6 +213,12 @@ void Delivery(void * pvParameters)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
     //Serial.print(data.toString(true));
+    /*------------------User Change Gateway--------------------*/
+    if(Gateway_Changed_byUser){ //Incase that address gateway belongs to node
+      String tmpIDofGateway = EnCodeAddressChannel(Gateway_AddH,Gateway_AddL,Gateway_Channel);
+      Locate.RemoveRouteViaFrom(tmpIDofGateway);
+      Gateway_Changed_byUser = false;
+    }
     /*------------------------Response------------------------*/
     if(data.GetMode() == ACK) //Receive ACK
     {
@@ -220,7 +227,7 @@ void Delivery(void * pvParameters)
       continue;//No mess fit ack
     }
     /*----------------------Memorize---------------------------*/
-    if(data.GetMode() == Memorize) //BUG: There is a realtime bug in here
+    if(data.GetMode() == Memorize)
     {
       if(data.GetData() == CommandDirect || data.GetData() == CommandNotDirect){ //Save in Friend
         Serial.println("Saving to Friend");
@@ -828,6 +835,7 @@ void Init_Server()
       Gateway_AddH = tmp0;
       Gateway_AddL = tmp1;
       sscanf(TmpPass.c_str(),"%02x",&Gateway_Channel);
+      Gateway_Changed_byUser = true;
       return request->send(No_Content_Code);
     }
     /*--------------------Username & Password---------------------------*/
@@ -1092,7 +1100,7 @@ void Hello_Around()
     Wait_to_Hello = millis();
     return;
   }
-  if( Friend_Channel != -1 && ((unsigned long)(millis()-Wait_to_Hello)> Five_minutes_millis))
+  if( Friend_Channel != -1 && ((unsigned long)(millis()-Wait_to_Hello)> A_minutes_millis))
   {
     if(Friend_Channel >= 0 && Friend_Channel <= 31){
       if(gateway_node == GATEWAY_STATUS)

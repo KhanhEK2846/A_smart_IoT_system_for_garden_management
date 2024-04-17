@@ -5057,8 +5057,9 @@
         "type": "function",
         "z": "9f5704f675d02eb6",
         "name": "Convert JSON",
-        "func": "var json = {\n    \"ID\": msg.topic,\n    \"time\": msg.timestamp,\n    \"Error_DHT\": msg.payload.Error.DHT11,\n    \"Error_LDR\": msg.payload.Error.LDR,\n    \"Error_Soil\": msg.payload.Error.Soil,\n    \"Name\": msg.payload.Name,\n    \"Days\": msg.payload.Plant.Days,\n    \"Humidity\": msg.payload.Sensor.DHT11.Humi,\n    \"Temperature\": msg.payload.Sensor.DHT11.Temp,\n    \"Light\": msg.payload.Sensor.Light,\n    \"Solid\": msg.payload.Sensor.Solid,\n    \"LED\": msg.payload.Status.Led,\n    \"MQTT\": msg.payload.Status.MQTT,\n    \"Pump\": msg.payload.Status.Pump\n};\nmsg.payload = json\nreturn msg;",
+        "func": "var json = {\n    \"ID\": msg.topic,\n    \"time\": msg.timestamp,\n    \"Error_DHT\": msg.payload.Error.DHT11,\n    \"Error_LDR\": msg.payload.Error.LDR,\n    \"Error_Soil\": msg.payload.Error.Soil,\n    \"Name\": msg.payload.Name,\n    \"Days\": msg.payload.Plant.Days,\n    \"Humidity\": msg.payload.Sensor.DHT11.Humi,\n    \"Temperature\": msg.payload.Sensor.DHT11.Temp,\n    \"Light\": msg.payload.Sensor.Light,\n    \"Solid\": msg.payload.Sensor.Solid,\n    \"LED\": msg.payload.Status.Led,\n    \"MQTT\": msg.payload.Status.MQTT,\n    \"Pump\": msg.payload.Status.Pump\n};\nmsg.path = global.get('argv')[5] + '\\\\data\\\\filedata.txt'\nmsg.payload = json\nreturn msg;",
         "outputs": 1,
+        "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -5076,8 +5077,8 @@
         "type": "file",
         "z": "9f5704f675d02eb6",
         "name": "StoreData",
-        "filename": "D:\\UIT\\Project\\Project2\\Clone\\Smart-big-garden-management-IoT-system\\Server\\data\\dataml.txt",
-        "filenameType": "str",
+        "filename": "path",
+        "filenameType": "msg",
         "appendNewline": true,
         "createDir": false,
         "overwriteFile": "false",
@@ -5086,6 +5087,68 @@
         "y": 340,
         "wires": [
             []
+        ]
+    },
+    {
+        "id": "bb51e824f5b2418f",
+        "type": "inject",
+        "z": "9f5704f675d02eb6",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "v": "",
+                "vt": "date"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 370,
+        "y": 720,
+        "wires": [
+            [
+                "b3e77267666af714"
+            ]
+        ]
+    },
+    {
+        "id": "74284cb242927a1c",
+        "type": "debug",
+        "z": "9f5704f675d02eb6",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "b3e77267666af714",
+        "type": "function",
+        "z": "9f5704f675d02eb6",
+        "name": "function 7",
+        "func": "msg.payload = global.get('argv');\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 720,
+        "wires": [
+            [
+                "74284cb242927a1c"
+            ]
         ]
     },
     {
@@ -5102,7 +5165,7 @@
         "tls": true,
         "name": "",
         "dname": "Notification",
-        "x": 1610,
+        "x": 1630,
         "y": 660,
         "wires": []
     },
