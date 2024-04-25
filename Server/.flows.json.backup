@@ -5090,68 +5090,6 @@
         ]
     },
     {
-        "id": "bb51e824f5b2418f",
-        "type": "inject",
-        "z": "9f5704f675d02eb6",
-        "name": "",
-        "props": [
-            {
-                "p": "topic",
-                "v": "",
-                "vt": "date"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "x": 370,
-        "y": 720,
-        "wires": [
-            [
-                "b3e77267666af714"
-            ]
-        ]
-    },
-    {
-        "id": "74284cb242927a1c",
-        "type": "debug",
-        "z": "9f5704f675d02eb6",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 900,
-        "y": 720,
-        "wires": []
-    },
-    {
-        "id": "b3e77267666af714",
-        "type": "function",
-        "z": "9f5704f675d02eb6",
-        "name": "function 7",
-        "func": "msg.payload = global.get('argv');\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 640,
-        "y": 720,
-        "wires": [
-            [
-                "74284cb242927a1c"
-            ]
-        ]
-    },
-    {
         "id": "d030a89ea742a909",
         "type": "e-mail",
         "z": "071ee232d3ea60d6",
@@ -5182,7 +5120,8 @@
         "wires": [
             [
                 "ca2c570997795358",
-                "935dbef6e0b17f67"
+                "935dbef6e0b17f67",
+                "040a0508d228e149"
             ]
         ]
     },
@@ -5272,7 +5211,7 @@
         "id": "a533d84ac893867f",
         "type": "function",
         "z": "071ee232d3ea60d6",
-        "name": "Check OutOf",
+        "name": "Check OutOfRecord",
         "func": "var OutOfRecord = flow.get(\"OutOfRecord\") || [];\nvar mess = \"\";\nfor (let i = 0; i < OutOfRecord.length; i++) {\n    var Change = false;\n    var date = new Date()\n    var data = OutOfRecord[i].data;\n    if(data.light == \"0\"){ //OFF\n        data.light_time = 0\n        data.light_warn = false   \n        data.light_past = data.light_value\n    }\n    if (data.pump == \"0\"){ //OFF\n        data.pump_time = 0\n        data.pump_warn = false\n        data.pump_past = data.pump_value\n    }\n    if(data.pump == \"1\" && !data.pump_warn){\n        if(data.pump_time == 0)\n            data.pump_time = date.getTime()//Milisecond\n        else if ((Number(data.pump_value) <= Number(data.pump_past) + 10 ) &&  (date.getTime() - data.pump_time >= 60000) ){\n            data.pump_warn = true;\n            Change = true;\n        }\n    }\n    if (data.light == \"1\" && !data.light_warn) {\n        if (data.light_time == 0)\n            data.light_time = date.getTime()//Milisecond\n        else if ((Number(data.light_value) <= Number(data.light_past) + 10) && (date.getTime() - data.light_time >= 60000)) {\n            data.light_warn = true;\n            Change = true;\n        }\n    }\n    if (Change){\n        mess += \"ID: \" + String(OutOfRecord[i].id) + \" \\n\"\n        if (data.pump_warn)\n            mess += \"Out Of Water \\n\"\n        if(data.light_warn)\n            mess += \"Broken Light \\n\"\n    }\n}\n\nflow.set(\"OutOfRecord\", OutOfRecord);\n\nif(mess != \"\"){\n    msg.payload = mess;\n    return msg;\n}\n",
         "outputs": 1,
         "timeout": 0,
@@ -5280,7 +5219,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 730,
+        "x": 760,
         "y": 660,
         "wires": [
             [
@@ -5306,11 +5245,12 @@
         "bytopic": "all",
         "topic": "topic",
         "outputs": 1,
-        "x": 690,
-        "y": 860,
+        "x": 630,
+        "y": 880,
         "wires": [
             [
-                "a533d84ac893867f"
+                "a533d84ac893867f",
+                "98216c1e534d3304"
             ]
         ]
     },
@@ -5365,6 +5305,63 @@
         "info": "",
         "x": 1490,
         "y": 560,
+        "wires": []
+    },
+    {
+        "id": "040a0508d228e149",
+        "type": "function",
+        "z": "071ee232d3ea60d6",
+        "name": "Storage OUtOfDate",
+        "func": "var OutOfDate = flow.get(\"OutOfDate\") || [];\nvar date = new Date()\n\n// Find ID if it has\nvar flag = -1;\nfor (let i = 0; i < OutOfDate.length; i++) {\n    if (OutOfDate[i].id == msg.topic) {\n        flag = i;\n        break;\n    }\n}\n\nif (flag == -1) // Save new ID\n{\n    OutOfDate.unshift({\n        \"id\": msg.topic,\n        \"time\": date.getTime(),//Milisecond\n        \"lost\": false\n    });\n\n} else { //Check Error\n    //Save change data\n\n    OutOfDate[flag].time = date.getTime()\n    OutOfDate[flag].lost = false\n\n}\nflow.set(\"OutOfDate\", OutOfDate);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 940,
+        "wires": [
+            [
+                "976cb9cd6a458206"
+            ]
+        ]
+    },
+    {
+        "id": "98216c1e534d3304",
+        "type": "function",
+        "z": "071ee232d3ea60d6",
+        "name": "Check OutOfDate",
+        "func": "var OutOfDate = flow.get(\"OutOfDate\") || [];\nvar mess = \"\";\n\nfor (let i = 0; i < OutOfDate.length; i++) {\n    var Change = false;\n    var date = new Date()\n    if ( !OutOfDate[i].lost && (date.getTime() - OutOfDate[i].time >= 60000))\n    {\n        OutOfDate[i].lost = true\n        Change = true\n    }\n    if (Change) {\n        mess += \"ID: \" + String(OutOfDate[i].id) + \" lost connect\\n\"\n    }\n}\n\nflow.set(\"OutOfDate\", OutOfDate);\n\nif (mess != \"\") {\n    msg.payload = mess;\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 980,
+        "wires": [
+            [
+                "783c84c65c81302f"
+            ]
+        ]
+    },
+    {
+        "id": "783c84c65c81302f",
+        "type": "debug",
+        "z": "071ee232d3ea60d6",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1080,
+        "y": 980,
         "wires": []
     },
     {
