@@ -429,7 +429,7 @@
     },
     "node-red-dashboard": {
         "name": "node-red-dashboard",
-        "version": "3.6.2",
+        "version": "3.6.5",
         "local": true,
         "user": true,
         "nodes": {
@@ -664,8 +664,7 @@
                 "module": "node-red-dashboard",
                 "file": "D:\\UIT\\Project\\Graduation\\Code\\Smart-big-garden-management-IoT-system\\Server\\node_modules\\node-red-dashboard\\nodes\\ui_spacer.js"
             }
-        },
-        "pending_version": "3.6.5"
+        }
     },
     "node-red-node-ui-table": {
         "name": "node-red-node-ui-table",
@@ -688,7 +687,7 @@
     },
     "@gogovega/node-red-contrib-firebase-realtime-database": {
         "name": "@gogovega/node-red-contrib-firebase-realtime-database",
-        "version": "0.5.4",
+        "version": "0.5.5",
         "local": true,
         "user": true,
         "nodes": {
@@ -747,8 +746,7 @@
                 "module": "@gogovega/node-red-contrib-firebase-realtime-database",
                 "file": "D:\\UIT\\Project\\Graduation\\Code\\Smart-big-garden-management-IoT-system\\Server\\node_modules\\@gogovega\\node-red-contrib-firebase-realtime-database\\build\\nodes\\on-disconnect.js"
             }
-        },
-        "pending_version": "0.5.5"
+        }
     },
     "node-red-contrib-machine-learning-v2": {
         "name": "node-red-contrib-machine-learning-v2",
@@ -903,7 +901,7 @@
     },
     "node-red-node-email": {
         "name": "node-red-node-email",
-        "version": "2.2.0",
+        "version": "2.2.1",
         "local": true,
         "user": true,
         "nodes": {
@@ -920,8 +918,7 @@
                 "module": "node-red-node-email",
                 "file": "D:\\UIT\\Project\\Graduation\\Code\\Smart-big-garden-management-IoT-system\\Server\\node_modules\\node-red-node-email\\61-email.js"
             }
-        },
-        "pending_version": "2.2.1"
+        }
     },
     "node-red-contrib-whatsapp-cmb": {
         "name": "node-red-contrib-whatsapp-cmb",

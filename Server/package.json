@@ -6,7 +6,6 @@
     "dependencies": {
         "@gogovega/node-red-contrib-firebase-realtime-database": "~0.5.5",
         "node-red-contrib-machine-learning-v2": "~1.0.9",
-        "node-red-contrib-telegrambot": "~15.1.9",
         "node-red-contrib-whatsapp-cmb": "~1.0.3",
         "node-red-dashboard": "~3.6.5",
         "node-red-node-email": "~2.2.1",

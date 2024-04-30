@@ -434,12 +434,13 @@
             "08696175be21e115",
             "e05bab43800f6790",
             "af49d308952e9952",
-            "b61dab2e70dd53f7"
+            "b61dab2e70dd53f7",
+            "3088e6d460d0f6d3"
         ],
         "x": 1294,
-        "y": 999,
+        "y": 979,
         "w": 552,
-        "h": 122
+        "h": 142
     },
     {
         "id": "d459a046ce05521b",
@@ -498,6 +499,29 @@
         "y": 399,
         "w": 472,
         "h": 302
+    },
+    {
+        "id": "a42d2f617a13f27d",
+        "type": "group",
+        "z": "4e5980765b3b01db",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "dcdd250e540b972f",
+            "e6c3685986739309",
+            "303457c98b3ed4d1"
+        ],
+        "x": 454,
+        "y": 799,
+        "w": 242,
+        "h": 142
     },
     {
         "id": "f532af6f73a050bd",
@@ -889,6 +913,39 @@
         "order": 2,
         "width": 23,
         "height": 1
+    },
+    {
+        "id": "23c2ada273cf88c6",
+        "type": "ui_group",
+        "name": "DevTool",
+        "tab": "539bf8a0140978c5",
+        "order": 4,
+        "disp": false,
+        "width": "1",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b0a62031992169bf",
+        "type": "ui_group",
+        "name": "DevTool",
+        "tab": "4633915231db9f2e",
+        "order": 3,
+        "disp": false,
+        "width": "1",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a861c7d956c9a2e5",
+        "type": "ui_group",
+        "name": "DevTool",
+        "tab": "45166d28cb8c42fd",
+        "order": 5,
+        "disp": false,
+        "width": "1",
+        "collapse": false,
+        "className": ""
     },
     {
         "id": "2eae1b674da8ac56",
@@ -3070,6 +3127,42 @@
         ]
     },
     {
+        "id": "9bc94be467cc2590",
+        "type": "ui_template",
+        "z": "2c7549e3267c360c",
+        "group": "23c2ada273cf88c6",
+        "name": "Home DevTool",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<script>\n    (function($scope) {\n    function OnDevToolIsOpen(){\n    let msg = {\"payload\": \"DevTool Open\", \"topic\": \"Dev Detect\"};\n    $scope.send(msg);\n    }\n\n    class DevToolChecker extends Error{\n    toString(){\n\n    }\n\n    get message(){\n    OnDevToolIsOpen();\n    }\n    }\n\n    console.log(new DevToolChecker())\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 240,
+        "y": 2380,
+        "wires": [
+            [
+                "e1b73220ce8edd98"
+            ]
+        ]
+    },
+    {
+        "id": "e1b73220ce8edd98",
+        "type": "link out",
+        "z": "2c7549e3267c360c",
+        "name": "DevTool",
+        "mode": "link",
+        "links": [
+            "dcdd250e540b972f"
+        ],
+        "x": 435,
+        "y": 2380,
+        "wires": []
+    },
+    {
         "id": "5fe6711eefb9e865",
         "type": "firebase-in",
         "z": "3992c3350543bb36",
@@ -3412,7 +3505,7 @@
         "id": "0182112f9ba31b02",
         "type": "link in",
         "z": "3992c3350543bb36",
-        "name": "link in 1",
+        "name": "Header_Name",
         "links": [
             "4275e1d50c63086d"
         ],
@@ -3497,6 +3590,42 @@
         "info": "",
         "x": 820,
         "y": 680,
+        "wires": []
+    },
+    {
+        "id": "b15aacc141441e90",
+        "type": "ui_template",
+        "z": "3992c3350543bb36",
+        "group": "b0a62031992169bf",
+        "name": "Record DevTool",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<script>\n    (function($scope) {\n    function OnDevToolIsOpen(){\n    let msg = {\"payload\": \"DevTool Open\", \"topic\": \"Dev Detect\"};\n    $scope.send(msg);\n    }\n\n    class DevToolChecker extends Error{\n    toString(){\n\n    }\n\n    get message(){\n    OnDevToolIsOpen();\n    }\n    }\n\n    console.log(new DevToolChecker())\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 280,
+        "y": 400,
+        "wires": [
+            [
+                "b61cd2b6a99a3a81"
+            ]
+        ]
+    },
+    {
+        "id": "b61cd2b6a99a3a81",
+        "type": "link out",
+        "z": "3992c3350543bb36",
+        "name": "DevTool",
+        "mode": "link",
+        "links": [
+            "dcdd250e540b972f"
+        ],
+        "x": 485,
+        "y": 400,
         "wires": []
     },
     {
@@ -4970,6 +5099,59 @@
         "wires": []
     },
     {
+        "id": "470dc03a254f272b",
+        "type": "ui_template",
+        "z": "7883bef42eddac18",
+        "group": "a861c7d956c9a2e5",
+        "name": "Setting DevTool",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<script>\n    (function($scope) {\n    function OnDevToolIsOpen(){\n    let msg = {\"payload\": \"DevTool Open\", \"topic\": \"Dev Detect\"};\n    $scope.send(msg);\n    }\n\n    class DevToolChecker extends Error{\n    toString(){\n\n    }\n\n    get message(){\n    OnDevToolIsOpen();\n    }\n    }\n\n    console.log(new DevToolChecker())\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 380,
+        "y": 2240,
+        "wires": [
+            [
+                "a1caaeffa2d1a34f"
+            ]
+        ]
+    },
+    {
+        "id": "a1caaeffa2d1a34f",
+        "type": "link out",
+        "z": "7883bef42eddac18",
+        "name": "DevTool",
+        "mode": "link",
+        "links": [
+            "dcdd250e540b972f"
+        ],
+        "x": 585,
+        "y": 2240,
+        "wires": []
+    },
+    {
+        "id": "3088e6d460d0f6d3",
+        "type": "link in",
+        "z": "7883bef42eddac18",
+        "g": "b838c7a2ac666cfb",
+        "name": "LogOut",
+        "links": [
+            "e6c3685986739309"
+        ],
+        "x": 1375,
+        "y": 1020,
+        "wires": [
+            [
+                "af49d308952e9952"
+            ]
+        ]
+    },
+    {
         "id": "99e13b1dc7ecaa22",
         "type": "firebase-get",
         "z": "9f5704f675d02eb6",
@@ -5501,6 +5683,51 @@
         "info": "",
         "x": 1090,
         "y": 300,
+        "wires": []
+    },
+    {
+        "id": "dcdd250e540b972f",
+        "type": "link in",
+        "z": "4e5980765b3b01db",
+        "g": "a42d2f617a13f27d",
+        "name": "DevTool",
+        "links": [
+            "74df1c9d4bdc5316",
+            "a1caaeffa2d1a34f",
+            "b61cd2b6a99a3a81",
+            "e1b73220ce8edd98"
+        ],
+        "x": 525,
+        "y": 900,
+        "wires": [
+            [
+                "e6c3685986739309"
+            ]
+        ]
+    },
+    {
+        "id": "e6c3685986739309",
+        "type": "link out",
+        "z": "4e5980765b3b01db",
+        "g": "a42d2f617a13f27d",
+        "name": "LogOut",
+        "mode": "link",
+        "links": [
+            "3088e6d460d0f6d3"
+        ],
+        "x": 655,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "303457c98b3ed4d1",
+        "type": "comment",
+        "z": "4e5980765b3b01db",
+        "g": "a42d2f617a13f27d",
+        "name": "Prevent DevTool",
+        "info": "",
+        "x": 560,
+        "y": 840,
         "wires": []
     }
 ]
