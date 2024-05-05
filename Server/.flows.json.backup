@@ -915,17 +915,6 @@
         "height": 1
     },
     {
-        "id": "7b14d0004043d5ac",
-        "type": "ui_group",
-        "name": "DevTool",
-        "tab": "571240d3094e1f9b",
-        "order": 2,
-        "disp": false,
-        "width": "1",
-        "collapse": false,
-        "className": ""
-    },
-    {
         "id": "23c2ada273cf88c6",
         "type": "ui_group",
         "name": "DevTool",
@@ -3881,42 +3870,6 @@
         "wires": []
     },
     {
-        "id": "fde635e289ec72e5",
-        "type": "ui_template",
-        "z": "0b1ec363aa46d36b",
-        "group": "7b14d0004043d5ac",
-        "name": "LogIn DevTool",
-        "order": 1,
-        "width": 0,
-        "height": 0,
-        "format": "<script>\n    (function($scope) {\n    function OnDevToolIsOpen(){\n    let msg = {\"payload\": \"DevTool Open\", \"topic\": \"Dev Detect\"};\n    $scope.send(msg);\n    }\n\n    class DevToolChecker extends Error{\n    toString(){\n\n    }\n\n    get message(){\n    OnDevToolIsOpen();\n    }\n    }\n\n    console.log(new DevToolChecker())\n})(scope);\n</script>",
-        "storeOutMessages": true,
-        "fwdInMessages": true,
-        "resendOnRefresh": true,
-        "templateScope": "local",
-        "className": "",
-        "x": 360,
-        "y": 860,
-        "wires": [
-            [
-                "74df1c9d4bdc5316"
-            ]
-        ]
-    },
-    {
-        "id": "74df1c9d4bdc5316",
-        "type": "link out",
-        "z": "0b1ec363aa46d36b",
-        "name": "DevTool",
-        "mode": "link",
-        "links": [
-            "dcdd250e540b972f"
-        ],
-        "x": 595,
-        "y": 860,
-        "wires": []
-    },
-    {
         "id": "c4cbda325e0bd937",
         "type": "ui_form",
         "z": "7883bef42eddac18",
@@ -4808,7 +4761,7 @@
         "z": "7883bef42eddac18",
         "g": "d459a046ce05521b",
         "name": "GetPhone",
-        "func": "var api = global.get(\"api\") || \"\"\nvar phone = global.get(\"phone\") || \"\"\n\nif (msg.topic == \"Change\"){\n    if( api == \"\" || phone == \"\"){\n        msg.payload = \"No Set Up\"\n    }else{\n        msg.payload = \"Phone Number: \" + phone + \"               API: \"+api\n    }\n}\nif (msg.topic == \"Reset\"){\n    msg.payload = \"No Set Up\"\n}\nreturn msg;",
+        "func": "var api = global.get(\"api\") || \"\"\nvar phone = global.get(\"phone\") || \"\"\n\nif (msg.topic == \"Change\"){\n    if( api == \"\" || phone == \"\"){\n        msg.payload = \"No Set Up\"\n    }else{\n        msg.payload = \"Phone Number: \" + phone + \"<br> API: \"+api\n    }\n}\nif (msg.topic == \"Reset\"){\n    msg.payload = \"No Set Up\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -5489,7 +5442,7 @@
         "z": "071ee232d3ea60d6",
         "g": "8a266268f9b6708a",
         "name": "Gateway Gmail",
-        "func": "var mail = global.get(\"mail\") || \"\"\n\nif (mail != \"\"){\n    msg.to = mail\n    return msg;\n}\n",
+        "func": "var mail = global.get(\"mail\") || \"\"\n\nif (mail != \"\"){\n    msg.to = mail\n    msg.topic = \"Server Notification\"\n    return msg;\n}\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -5664,7 +5617,7 @@
         "z": "4e5980765b3b01db",
         "g": "0c68598919b2722c",
         "name": "AlreadyLogIn",
-        "func": "var LogIn = global.get(\"LogIn\") || false\nif(!LogIn && msg.tab != 0 && msg.name != \"Login\"){\n    return msg;\n}\n",
+        "func": "var LogIn = global.get(\"LogIn\") || false\nif(!LogIn && msg.tab != 0 && msg.name != \"Login\"){\n    return msg;\n}\n/*--------------------------------------------*/\nif(LogIn && msg.tab == 0 && msg.name == \"Login\"){\n    global.set(\"LogIn\",false)\n    return msg;\n}\n\n\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,

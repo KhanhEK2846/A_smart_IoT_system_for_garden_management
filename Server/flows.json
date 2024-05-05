@@ -824,56 +824,6 @@
         "className": ""
     },
     {
-        "id": "5e2005d86ec1976f",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 2,
-        "width": 23,
-        "height": 1
-    },
-    {
-        "id": "2173d3fd714c8fe2",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 5,
-        "width": 9,
-        "height": 1
-    },
-    {
-        "id": "7b1d7555c83aecc2",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 7,
-        "width": 2,
-        "height": 1
-    },
-    {
-        "id": "9aa2c284ac2c4466",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 9,
-        "width": 2,
-        "height": 1
-    },
-    {
-        "id": "aa062fcbf6da408b",
-        "type": "ui_spacer",
-        "z": "3992c3350543bb36",
-        "name": "spacer",
-        "group": "6b0fc43246790e58",
-        "order": 11,
-        "width": 9,
-        "height": 1
-    },
-    {
         "id": "3df901b014d88607",
         "type": "ui_group",
         "name": "Phone",
@@ -946,6 +896,56 @@
         "width": "1",
         "collapse": false,
         "className": ""
+    },
+    {
+        "id": "c22e350543f1ba38",
+        "type": "ui_spacer",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 2,
+        "width": 23,
+        "height": 1
+    },
+    {
+        "id": "b6305446d205e588",
+        "type": "ui_spacer",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 5,
+        "width": 9,
+        "height": 1
+    },
+    {
+        "id": "a55a284ae51247f5",
+        "type": "ui_spacer",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 7,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "f7fa68ebdece8240",
+        "type": "ui_spacer",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 9,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "e7ed44b3739e2bc8",
+        "type": "ui_spacer",
+        "z": "3992c3350543bb36",
+        "name": "spacer",
+        "group": "6b0fc43246790e58",
+        "order": 11,
+        "width": 9,
+        "height": 1
     },
     {
         "id": "2eae1b674da8ac56",
@@ -3193,7 +3193,7 @@
         "name": "Table Record",
         "order": 4,
         "width": 25,
-        "height": 6,
+        "height": 7,
         "columns": [],
         "outputs": 1,
         "cts": true,
@@ -4761,7 +4761,7 @@
         "z": "7883bef42eddac18",
         "g": "d459a046ce05521b",
         "name": "GetPhone",
-        "func": "var api = global.get(\"api\") || \"\"\nvar phone = global.get(\"phone\") || \"\"\n\nif (msg.topic == \"Change\"){\n    if( api == \"\" || phone == \"\"){\n        msg.payload = \"No Set Up\"\n    }else{\n        msg.payload = \"Phone Number: \" + phone + \"               API: \"+api\n    }\n}\nif (msg.topic == \"Reset\"){\n    msg.payload = \"No Set Up\"\n}\nreturn msg;",
+        "func": "var api = global.get(\"api\") || \"\"\nvar phone = global.get(\"phone\") || \"\"\n\nif (msg.topic == \"Change\"){\n    if( api == \"\" || phone == \"\"){\n        msg.payload = \"No Set Up\"\n    }else{\n        msg.payload = \"Phone Number: \" + phone + \"<br> API: \"+api\n    }\n}\nif (msg.topic == \"Reset\"){\n    msg.payload = \"No Set Up\"\n}\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -5442,7 +5442,7 @@
         "z": "071ee232d3ea60d6",
         "g": "8a266268f9b6708a",
         "name": "Gateway Gmail",
-        "func": "var mail = global.get(\"mail\") || \"\"\n\nif (mail != \"\"){\n    msg.to = mail\n    return msg;\n}\n",
+        "func": "var mail = global.get(\"mail\") || \"\"\n\nif (mail != \"\"){\n    msg.to = mail\n    msg.topic = \"Server Notification\"\n    return msg;\n}\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -5617,7 +5617,7 @@
         "z": "4e5980765b3b01db",
         "g": "0c68598919b2722c",
         "name": "AlreadyLogIn",
-        "func": "var LogIn = global.get(\"LogIn\") || false\nif(!LogIn && msg.tab != 0 && msg.name != \"Login\"){\n    return msg;\n}\n",
+        "func": "var LogIn = global.get(\"LogIn\") || false\nif(!LogIn && msg.tab != 0 && msg.name != \"Login\"){\n    return msg;\n}\n/*--------------------------------------------*/\nif(LogIn && msg.tab == 0 && msg.name == \"Login\"){\n    global.set(\"LogIn\",false)\n    return msg;\n}\n\n\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,

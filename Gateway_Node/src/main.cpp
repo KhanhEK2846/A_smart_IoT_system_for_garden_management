@@ -483,12 +483,12 @@ void Capture(void * pvParameters)
 void Init_LoRa()
 {
   lora.begin();
-  ResponseStructContainer c = lora.getConfiguration();
-  Configuration configuration = *(Configuration*) c.data;
-  CalculateAddressChannel(ID,Own_AddH,Own_AddL,Own_Channel);
-  Own_address = EnCodeAddressChannel(Own_AddH,Own_AddL,Own_Channel);
+  ResponseStructContainer c = lora.getConfiguration(); 
   if(c.status.code == 1)
   {
+    Configuration configuration = *(Configuration*) c.data;
+    CalculateAddressChannel(ID,Own_AddH,Own_AddL,Own_Channel);
+    Own_address = EnCodeAddressChannel(Own_AddH,Own_AddL,Own_Channel);
     configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
     configuration.ADDH = Own_AddH;
     configuration.ADDL = Own_AddL;
