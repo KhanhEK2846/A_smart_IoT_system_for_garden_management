@@ -48,7 +48,6 @@ ActuatorStatus statusActuator;
 Protection protect;
 //LoRa Variable
 LoRa_E32 lora(&Serial2,AUX_Port,M1_Port,M0_Port); //16-->TX 17-->RX 4-->AUX 5-->M1 18-->M0 
-volatile boolean lora_flag = false;
 uint8_t Own_AddH;
 uint8_t Own_AddL;
 uint8_t Own_Channel;
@@ -171,9 +170,10 @@ void Cycle_Ping()// Cycle Ping to Host // FIX:
 #pragma region LoRa
 void Reset_ConfigurationLoRa(boolean gateway = true)
 {
-  if(!lora_flag)
-    return;
   ResponseStructContainer c = lora.getConfiguration();
+  if(c.status.code != 1)
+    return;
+  
   Configuration configuration = *(Configuration*) c.data;
   if(gateway)
   {
@@ -501,15 +501,9 @@ void Init_LoRa()
     configuration.OPTION.wirelessWakeupTime = 0;
     configuration.OPTION.fec = 0b1;
     configuration.OPTION.transmissionPower = 0;
-    lora_flag = true;
     if(gateway_node == DEFAULt_STATUS){
       gateway_node = NODE_STATUS;
-    }
-      
-  }
-  else
-  {
-    lora_flag = false;
+    }   
   }
   c.close();
 }
