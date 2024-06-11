@@ -73,6 +73,7 @@ WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 boolean MQTTStatus = false; //Status Connect Broker
 String MQTT_Messange = "";
+String MQTT_Command = "";
 //Local Server Variable
 AsyncWebServer server(80); //Create a web server listening on port 80
 AsyncWebSocket ws("/ws");//Create a path for web socket server
@@ -643,30 +644,12 @@ void callback(char* topic, byte *payload, unsigned int length)// Receive Messang
   if(String((char*)payload).indexOf("{") == -1 || String((char*)payload).lastIndexOf("}") == -1) //Filter Message From Server
     return;
   MQTT_Messange = String((char*)payload).substring(String((char*)payload).indexOf("{")+1,String((char*)payload).indexOf("}"));
-  String t_ID = MQTT_Messange.substring(0,MQTT_Messange.indexOf("/"));
-  String t_command = MQTT_Messange.substring(MQTT_Messange.indexOf(" ")+1,MQTT_Messange.length());
-  boolean flag = false;
-  if(String(topic) == MQTT_Pump_TOPIC){ 
-    if(t_ID == ID)
-    {
-      if(t_command == "N")
-          Command_Pump = ON;
-      else if(t_command == "F")
-          Command_Pump = OFF;
-    }else flag = true;
-  }
-  if(String(topic) == MQTT_LED_TOPIC){ 
-    if(t_ID == ID)
-    {
-      if(t_command == "N")
-          Command_Light = ON;
-      else if(t_command == "F")
-          Command_Light = OFF;
-    }else flag = true;
-  }
-  if(flag)
-  {    
-    MQTT_Data.SetDataPackage(t_ID,"",MQTT_Messange.substring(MQTT_Messange.indexOf("/")+1,MQTT_Messange.length()),CommandDirect);
+  MQTT_Command = MQTT_Messange.substring(MQTT_Messange.indexOf("/")+1,MQTT_Messange.length());
+  if(ID == MQTT_Messange.substring(0,MQTT_Messange.indexOf("/")))
+  {
+    xQueueSend(Queue_Command,&MQTT_Command,pdMS_TO_TICKS(10));
+  }else{    
+    MQTT_Data.SetDataPackage(MQTT_Messange.substring(0,MQTT_Messange.indexOf("/")),"",MQTT_Command,CommandDirect);
     xQueueSend(Queue_Delivery,&MQTT_Data,pdMS_TO_TICKS(10));
   }
 }
