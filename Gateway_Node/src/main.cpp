@@ -1241,7 +1241,6 @@ void Solve_Command()
       return;
     }
   }
-  O_Command.clear();
 }
 void Init_Task()
 {
