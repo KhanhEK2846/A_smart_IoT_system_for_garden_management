@@ -10,7 +10,6 @@
 #include "CycleTime.h"
 
 AsyncWebServer server(80); //Create a web server listening on port 80
-AsyncWebSocket ws("/ws");//Create a path for web socket server
 
 enum PORT{
   DHTPIN_Port = 21,
@@ -73,7 +72,6 @@ unsigned long timeExport = 0;
 
 //count
 volatile int count = 0;
-DataPackage predata;
 
 /*------------------------------------------------------------------------------------------*/
 void Reset_ConfigurationLoRa(boolean gateway = true)
@@ -120,11 +118,15 @@ void Delivery(void * pvParameters)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
 
-if(data.GetMode() == ACK) { //Send Back
-DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
-lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
-}else{
-lora.sendFixedMessage(Gateway_AddH,Gateway_AddL,Gateway_Channel,data.toString());}
+  if(data.GetMode() == ACK) { //Send Back
+    DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
+    lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
+    Serial.println("ACK Send");
+  }else if(data.GetMode() == Default){
+    Serial.println(data.toString(true));
+    lora.sendFixedMessage(Gateway_AddH,Gateway_AddL,Gateway_Channel,data.toString());
+    Serial.println("Gateway Send");
+    }
     
   }
     // Serial.print("Delivery Task: ");
@@ -160,8 +162,9 @@ void Capture(void * pvParameters)
       xQueueSend(Queue_Command,&D_Command,pdMS_TO_TICKS(10));
 
 if (Receive_Pack.GetMode() == Default ) {
-ResponseACK.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),ID,"");
-xQueueSend(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));}
+    ResponseACK.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),ID,"");
+    xQueueSend(Queue_Delivery,&ResponseACK,pdMS_TO_TICKS(10));
+    }
  
       
     } else delay(10);
@@ -180,7 +183,13 @@ void Init_LoRa()
   {
     Configuration configuration = *(Configuration*) c.data;
     CalculateAddressChannel(ID,Own_AddH,Own_AddL,Own_Channel);
-    Own_address = EnCodeAddressChannel(Own_AddH,Own_AddL,Own_Channel);
+    char macStr[3] = { 0 };
+    sprintf(macStr,"%02x%02x%02x", Own_AddH,Own_AddL,Own_Channel);
+    Own_address = String(macStr);
+    Serial.println(Own_AddH);
+    Serial.println(Own_AddL);
+    Serial.println(Own_Channel);
+    Serial.println(Own_address);
     configuration.OPTION.fixedTransmission = FT_FIXED_TRANSMISSION;
     configuration.ADDH = Own_AddH;
     configuration.ADDL = Own_AddL;
@@ -213,17 +222,12 @@ void PostponeSend(void * pvParameters)
   }
 }
 
-void initWebSocket() //Initialize the WebSocket protocol
-{
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
-}
 
 void Init_Server(){
-server.on("/Test",HTTP_GET,[](AsyncWebServerRequest *request){
-    return request->send_P(Received_Code,"text/plain",packageCount.Export());
+  server.on("/Test",HTTP_GET,[](AsyncWebServerRequest *request){
+    return request->send_P(Received_Code,"text/plain",packageCount.Export().c_str());
   });
-server.begin();
+  server.begin();
 }
 
 void Init_Task()
@@ -263,14 +267,12 @@ void setup(){
   Serial.println();
   Init_LoRa();
   Init_Task();
-initWebSocket();
-WiFi.mode(WIFI_AP_STA);
-WiFi.softAP(ap_id.c_str(), ap_pass.c_str());
-Init_Server();
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP(ap_id.c_str(), ap_pass.c_str());
+  Init_Server();
   timeSend = millis();
   timeExport = millis();
   O_Pack.SetDataPackage(ID,Own_address,ID,Default);
-  predata.SetDataPackage(ID,Own_address,String(count),Default);
   if(id != ""){
     WiFi.begin(id,pass);
     long current = millis();
@@ -296,6 +298,7 @@ void loop(){
   {
     timeSend = millis();
     xQueueSend(Queue_Delivery,&O_Pack,pdMS_TO_TICKS(10));
+     O_Pack.SetDataPackage(ID,Own_address,ID,Default);
     count++;
   }
   if(((unsigned long)(millis() - timeExport) >= A_minutes_millis)){

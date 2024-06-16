@@ -32,6 +32,7 @@ enum PORT{
 };
 //DHT11 Variable
 #define DHTTYPE DHT11 
+//#define DHTTYPE DHT22 
 DHT dht(DHTPIN_Port, DHTTYPE);
 //Data Sensor
 DataSensor dataSensor;
