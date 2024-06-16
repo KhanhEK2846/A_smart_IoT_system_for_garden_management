@@ -211,6 +211,7 @@ void Delivery(void * pvParameters)
   Remember Locate;
   int Preventive_Channel = 0;
   int ACK_Locate = -1;
+  uint32_t delayTime = 3000;
   while(true)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
@@ -302,6 +303,7 @@ void Delivery(void * pvParameters)
     if(data.expired == 0)
     {
       Serial.println("Expired");
+      delayTime = (delayTime >= 5000)? 5000: delayTime + 50;
       if(data.GetMode() == CommandNotDirect) // Remove ID From Memory
       {
         Locate.RemoveRoute(data.GetID());
@@ -353,6 +355,7 @@ void Delivery(void * pvParameters)
         {
           Locate.RemoveACK(ACK_Locate);
           Serial.println("Remove Message Log");
+          delayTime = (delayTime <= 3000)? 3000: delayTime - 50;
           continue;
         }
       }
@@ -370,6 +373,7 @@ void Delivery(void * pvParameters)
         {
           Locate.RemoveACK(ACK_Locate);
           Serial.println("Remove Message Command");
+          delayTime = (delayTime <= 3000)? 3000: delayTime - 50;
           continue;
         }
       }
@@ -397,7 +401,7 @@ void Delivery(void * pvParameters)
     // uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
     // Serial.println(uxHighWaterMark);
     // Serial.println();
-    delay(3000);
+    delay(delayTime);
   }
 }
 void Capture(void * pvParameters)
