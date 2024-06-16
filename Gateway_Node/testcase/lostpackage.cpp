@@ -113,7 +113,11 @@ void Delivery(void * pvParameters)
   {
     xQueueReceive(Queue_Delivery,&data,portMAX_DELAY);
 
-    lora.sendFixedMessage(Gateway_AddH,Gateway_AddL,Gateway_Channel,data.toString());
+if(data.GetMode() == ACK) { //Send Back
+DeCodeAddressChannel(data.GetFrom(),DeliveryH,DeliveryL,DeliveryChan);
+lora.sendFixedMessage(DeliveryH,DeliveryL,DeliveryChan,data.toString());
+}else{
+lora.sendFixedMessage(Gateway_AddH,Gateway_AddL,Gateway_Channel,data.toString());}
     
   }
     // Serial.print("Delivery Task: ");
@@ -133,7 +137,7 @@ void Capture(void * pvParameters)
   DataPackage Memory_Pack;
   String D_Command;
   Memory_Pack.SetMode(Memorize);
-  ResponseACK.SetMode(PrepareACK);
+  ResponseACK.SetMode(ACK);
   const String Own_Adrress = *((String*)pvParameters);
   while (true)
   {
@@ -147,6 +151,11 @@ void Capture(void * pvParameters)
       Serial.println(Receive_Pack.toString(true));
       D_Command = Receive_Pack.GetData();
       xQueueSend(Queue_Command,&D_Command,pdMS_TO_TICKS(10));
+
+if (Receive_Pack.GetMode() == Default ) {
+ResponseACK.SetDataPackage(Receive_Pack.GetID(),Receive_Pack.GetFrom(),ID,"");
+xQueueSend(Queue_Delivery,&Receive_Pack,pdMS_TO_TICKS(10));}
+ 
       
     } else delay(10);
 
