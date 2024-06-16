@@ -4,8 +4,13 @@
 #include <DataPackage.h>
 #include <Remember.h>
 #include <CountPackage.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include "CommandCode.h"
 #include "CycleTime.h"
+
+AsyncWebServer server(80); //Create a web server listening on port 80
+AsyncWebSocket ws("/ws");//Create a path for web socket server
 
 enum PORT{
   DHTPIN_Port = 21,
@@ -22,6 +27,8 @@ CountPackage packageCount;
 
 const String id = "";
 const String pass = "";
+const String ap_id = WiFi.macAddress();
+const String ap_pass = "1234567890";
 
 //Define LoRa
 LoRa_E32 lora(&Serial2,AUX_Port,M1_Port,M0_Port);
@@ -206,6 +213,19 @@ void PostponeSend(void * pvParameters)
   }
 }
 
+void initWebSocket() //Initialize the WebSocket protocol
+{
+  ws.onEvent(onEvent);
+  server.addHandler(&ws);
+}
+
+void Init_Server(){
+server.on("/Test",HTTP_GET,[](AsyncWebServerRequest *request){
+    return request->send_P(Received_Code,"text/plain",packageCount.Export());
+  });
+server.begin();
+}
+
 void Init_Task()
 {
   Queue_Delivery = xQueueCreate(Queue_Length,Queue_item_delivery_size+1);
@@ -243,6 +263,10 @@ void setup(){
   Serial.println();
   Init_LoRa();
   Init_Task();
+initWebSocket();
+WiFi.mode(WIFI_AP_STA);
+WiFi.softAP(ap_id.c_str(), ap_pass.c_str());
+Init_Server();
   timeSend = millis();
   timeExport = millis();
   O_Pack.SetDataPackage(ID,Own_address,ID,Default);
