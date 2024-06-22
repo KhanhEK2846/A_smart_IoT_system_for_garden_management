@@ -49,6 +49,7 @@ ActuatorStatus statusActuator;
 Protection protect;
 //LoRa Variable
 LoRa_E32 lora(&Serial2,AUX_Port,M1_Port,M0_Port); //16-->TX 17-->RX 4-->AUX 5-->M1 18-->M0 
+boolean lora_flag = false;
 uint8_t Own_AddH;
 uint8_t Own_AddL;
 uint8_t Own_Channel;
@@ -172,10 +173,10 @@ void Cycle_Ping()// Cycle Ping to Host // FIX:
 #pragma region LoRa
 void Reset_ConfigurationLoRa(boolean gateway = true)
 {
-  ResponseStructContainer c = lora.getConfiguration();
-  if(c.status.code != 1)
+  if(!lora_flag)
     return;
   
+  ResponseStructContainer c = lora.getConfiguration();
   Configuration configuration = *(Configuration*) c.data;
   if(gateway)
   {
@@ -417,6 +418,7 @@ void Capture(void * pvParameters)
     uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
     if(lora.available()>1)
     {
+      Serial.println("Capture data");
       mess = lora.receiveMessageUntil();
       if(!Receive_Pack.fromString(mess.data))
          continue;
@@ -486,8 +488,11 @@ void Init_LoRa()
 {
   lora.begin();
   ResponseStructContainer c = lora.getConfiguration(); 
+    Serial.println(c.status.code);
+  Serial.println(c.status.getResponseDescription());
   if(c.status.code == 1)
   {
+    lora_flag = true;
     Configuration configuration = *(Configuration*) c.data;
     CalculateAddressChannel(ID,Own_AddH,Own_AddL,Own_Channel);
     Own_address = EnCodeAddressChannel(Own_AddH,Own_AddL,Own_Channel);
@@ -506,6 +511,8 @@ void Init_LoRa()
     if(gateway_node == DEFAULt_STATUS){
       gateway_node = NODE_STATUS;
     }   
+  }else{
+    lora_flag = false;
   }
   c.close();
 }
