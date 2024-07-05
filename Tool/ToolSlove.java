@@ -1,4 +1,4 @@
-package Tool;
+
 
 public class ToolSlove {
 
